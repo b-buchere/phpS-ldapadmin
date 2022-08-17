@@ -29,11 +29,14 @@ use Symfony\Component\HttpClient\HttpClient;
 use LdapRecord\Models\ActiveDirectory\Group;
 use App\Services\HTMLTree;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use PDO;
 use App\Services\AJAXTree;
 use LdapRecord\Auth\BindException;
 use App\Services\TreeItem;
 use App\Services\LdapCustomFunctions;
 use App\Security\Voter\UserVoter;
+use League\Csv\Reader;
+use League\Csv\Statement;
 /**
  * @Route("/ldapadmin", name="ldapadmin_")
  */
@@ -283,6 +286,134 @@ class LdapAdminController extends BaseController
         }
         return $this->render('ldap/admin/groupcreate.html.twig', [
             'form'=>$form->createView()
+        ]);
+    }
+    
+    /**
+     * @Route("/groupbulk", name="groupbulk")
+     */
+    public function bulkGroup(Request $request): Response
+    {
+        $form = $this->createForm(LdapOucreateType::class, null);
+        
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            
+            $server = $this->getParameter('ldap_server');
+            $dn = $this->getParameter('ad_base_dn');
+            $user_admin = $this->getParameter('ad_passwordchanger_user');
+            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+            
+            // Create a new connection:
+            $connection = new Connection([
+                'hosts' => [$server],
+                'port' => 389,
+                'base_dn' => $dn,
+                'username' => $user_admin,
+                'password' => $user_pwd,
+            ]);
+            
+            // Add the connection into the container:
+            /*Container::addConnection($connection);
+             // connexion � un compte pour la lecture de l'annuaire
+             
+             
+             $transverseDn = "OU=Groups,OU=TRANSVERSE,DC=ncunml,DC=ass";
+             /**
+             * @var OrganizationalUnit $ou
+             */
+            
+            /*$group = (new Group)->inside($transverseDn);
+             $group->cn = 'GT_'.strtoupper( $data["groupName"] );
+             $group->save();*/
+        }
+        return $this->render('ldap/admin/groupcreate.html.twig', [
+            'form'=>$form->createView()
+        ]);
+    }
+    
+    /**
+     * @Route("/userbulk", name="userbulk")
+     */
+    public function bulkUser(Request $request): Response
+    {
+        /*$form = $this->createForm(LdapOucreateType::class, null);
+        
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            
+            $server = $this->getParameter('ldap_server');
+            $dn = $this->getParameter('ad_base_dn');
+            $user_admin = $this->getParameter('ad_passwordchanger_user');
+            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+            
+            // Create a new connection:
+            $connection = new Connection([
+                'hosts' => [$server],
+                'port' => 389,
+                'base_dn' => $dn,
+                'username' => $user_admin,
+                'password' => $user_pwd,
+            ]);
+            
+            // Add the connection into the container:
+            /*Container::addConnection($connection);
+             // connexion � un compte pour la lecture de l'annuaire
+             
+             
+             $transverseDn = "OU=Groups,OU=TRANSVERSE,DC=ncunml,DC=ass";
+             /**
+             * @var OrganizationalUnit $ou
+             */
+            
+            /*$group = (new Group)->inside($transverseDn);
+             $group->cn = 'GT_'.strtoupper( $data["groupName"] );
+             $group->save();*/
+        //}
+        
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
+        
+        $csv = Reader::createFromPath('../uploads/user.csv', 'r');
+        $csv->setDelimiter(";");
+        $csv->setHeaderOffset(0); //set the CSV header offset
+        dump($csv);
+        
+        $records = $csv->getRecords();
+        dump($records);
+        foreach ($records as $record) {
+            dump($record);
+            
+            $user = User::findBy('cn', $record['Prenom'].' '.$record['Nom']);
+            if(is_null($user)){
+                $user = (new User)->inside($dn);
+                $user->cn = $record['Prenom'].' '.$record['Nom'];
+                continue;
+            }
+            
+        }
+        
+        return $this->render('ldap/admin/userbulk.html.twig', [
+            //'form'=>$form->createView()
         ]);
     }
 }
