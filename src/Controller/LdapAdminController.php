@@ -37,6 +37,10 @@ use App\Services\LdapCustomFunctions;
 use App\Security\Voter\UserVoter;
 use League\Csv\Reader;
 use League\Csv\Statement;
+use utilphp;
+use utilphp\util;
+use App\Form\LdapUserbulkType;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 /**
  * @Route("/ldapadmin", name="ldapadmin_")
  */
@@ -339,13 +343,18 @@ class LdapAdminController extends BaseController
      */
     public function bulkUser(Request $request): Response
     {
-        /*$form = $this->createForm(LdapOucreateType::class, null);
+        $form = $this->createForm(LdapUserbulkType::class, null);
         
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            
+            /**
+             * @var UploadedFile $file
+             */
+            $file = $data['fileimport'];
+            $file->move('../uploads', 'user.csv');
+
             $server = $this->getParameter('ldap_server');
             $dn = $this->getParameter('ad_base_dn');
             $user_admin = $this->getParameter('ad_passwordchanger_user');
@@ -358,62 +367,48 @@ class LdapAdminController extends BaseController
                 'base_dn' => $dn,
                 'username' => $user_admin,
                 'password' => $user_pwd,
+                'use_tls'  => true
             ]);
             
-            // Add the connection into the container:
-            /*Container::addConnection($connection);
-             // connexion � un compte pour la lecture de l'annuaire
-             
-             
-             $transverseDn = "OU=Groups,OU=TRANSVERSE,DC=ncunml,DC=ass";
-             /**
-             * @var OrganizationalUnit $ou
-             */
+            $connection->connect();
             
-            /*$group = (new Group)->inside($transverseDn);
-             $group->cn = 'GT_'.strtoupper( $data["groupName"] );
-             $group->save();*/
-        //}
-        
-        $server = $this->getParameter('ldap_server');
-        $dn = $this->getParameter('ad_base_dn');
-        $user_admin = $this->getParameter('ad_passwordchanger_user');
-        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-        
-        // Create a new connection:
-        $connection = new Connection([
-            'hosts' => [$server],
-            'port' => 389,
-            'base_dn' => $dn,
-            'username' => $user_admin,
-            'password' => $user_pwd,
-        ]);
-        
-        $connection->connect();
-        
-        Container::addConnection($connection);
-        
-        $csv = Reader::createFromPath('../uploads/user.csv', 'r');
-        $csv->setDelimiter(";");
-        $csv->setHeaderOffset(0); //set the CSV header offset
-        dump($csv);
-        
-        $records = $csv->getRecords();
-        dump($records);
-        foreach ($records as $record) {
-            dump($record);
+            Container::addConnection($connection);
             
-            $user = User::findBy('cn', $record['Prenom'].' '.$record['Nom']);
-            if(is_null($user)){
-                $user = (new User)->inside($dn);
-                $user->cn = $record['Prenom'].' '.$record['Nom'];
-                continue;
+            $csv = Reader::createFromPath('../uploads/user.csv', 'r');
+            $csv->setDelimiter(";");
+            $csv->setHeaderOffset(0); //set the CSV header offset
+            
+            $records = $csv->getRecords();
+            $utilphp = new util();
+            foreach ($records as $record) {
+                
+                $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
+
+                if(is_null($user)){
+                    $user = (new User)->inside('ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
+                    $user->cn = $record['Prenom'].' '.$record['Nom'];
+                    $user->unicodePwd = '';
+                    $user->samaccountname = strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom']));
+                    $user->mail = $record['email'];
+                    $user->userAccountControl = 512;
+                    $user->pwdlastset = 0;
+                    
+                    try {
+                        $user->save();
+                    } catch (\LdapRecord\LdapRecordException $e) {
+                        // Failed saving user.
+                    }
+                }
+                
             }
             
+            unlink('../uploads/user.csv');
         }
         
+        
+        
         return $this->render('ldap/admin/userbulk.html.twig', [
-            //'form'=>$form->createView()
+            'form'=>$form->createView()
         ]);
     }
 }

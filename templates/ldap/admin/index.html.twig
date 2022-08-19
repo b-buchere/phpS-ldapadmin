@@ -6,10 +6,13 @@ Lister les d�tails
 
 {% block body %}
         {% if is_granted('create', user) %}
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_groupcreate') }}">
+        <button id="groupcre" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_groupcreate') }}">
             Créer des groupes
         </button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_oucreate') }}">
+            Créer des OU
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_userbulk') }}">
             Créer des OU
         </button>
         {% endif %}

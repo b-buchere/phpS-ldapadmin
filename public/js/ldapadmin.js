@@ -6,7 +6,7 @@ $(document).ready(function() {
     })
     
     $('#asyncModal').on('show.bs.modal', function (event) {
-        $.ajax("/ldapadmin/groupcreate")
+        $.ajax(event.relatedTarget.dataset['href'])
         .done(function(asyncContent ){
             $('#asyncModal .modal-body').html(asyncContent);
         });
