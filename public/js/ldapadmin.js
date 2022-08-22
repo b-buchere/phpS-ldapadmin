@@ -9,6 +9,22 @@ $(document).ready(function() {
         $.ajax(event.relatedTarget.dataset['href'])
         .done(function(asyncContent ){
             $('#asyncModal .modal-body').html(asyncContent);
+            
+            $('#asyncModal .modal-body form').on('submit',function(e){
+            	var form = e.currentTarget;
+            	var formData = new FormData($(this)[0]);
+            	if( form.name == "ldap_user_group_update"){
+	            	e.preventDefault();
+            	    
+		            $.ajax({
+		                url: "/ldapadmin/usergroupupdate",
+		                method: 'POST',
+                        processData: false,
+            			contentType: false,
+		                data: formData
+		            });
+            	}
+            });
         });
       });
     

@@ -13,7 +13,10 @@ Lister les d�tails
             Créer des OU
         </button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_userbulk') }}">
-            Créer des OU
+            Import d'utilisateur par fichier
+        </button>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_usergroupupdate') }}">
+            Mise à jour des groupes utilisateurs
         </button>
         {% endif %}
     <div class="position-relative">
