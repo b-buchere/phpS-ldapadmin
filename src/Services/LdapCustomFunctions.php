@@ -211,7 +211,6 @@ class LdapCustomFunctions
             $ldapOuSanitized = util::sanitize_string($ou->getName());
             $entry->setSanitizedName($ldapOuSanitized);
             $entry->setDisplayName($ou->getName());
-            
             //dump($ou->getName());
             $childCount = count($descendantsOu) + count($users) + count($groups);
             if($childCount){

@@ -5,7 +5,7 @@
     <nav class="mt-2">
         {{ baseTree }}
         <ul class="nav nav-pills nav-sidebar flex-column ms-2" role="menu" data-accordion="false">
-            {{ macros.treeitems(tree.entries[baseTree].children, tree) }}
+            {{ macros.treeitems(tree.entries[baseTree].children, tree, user) }}
 
         </ul>
     </div>

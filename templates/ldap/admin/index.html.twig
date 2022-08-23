@@ -6,11 +6,8 @@ Lister les d�tails
 
 {% block body %}
         {% if is_granted('create', user) %}
-        <button id="groupcre" type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_groupcreate') }}">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_groupcreate') }}">
             Créer des groupes
-        </button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_oucreate') }}">
-            Créer des OU
         </button>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_userbulk') }}">
             Import d'utilisateur par fichier
@@ -20,20 +17,18 @@ Lister les d�tails
         </button>
         {% endif %}
     <div class="position-relative">
-    <div id="tree" class="col-4 position-absolute">
+        <div id="tree" class="col-3">
+    
+        </div>
+        <div id="object_details" class="col-9">
+        </div>
 
     </div>
-
-</div>
 
 
 <div class="modal fade" id="asyncModal" tabindex="-1" aria-labelledby="asyncModalLabel" aria-hidden="true">
   <div class="modal-dialog">
     <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
       <div class="modal-body">
         ...
       </div>

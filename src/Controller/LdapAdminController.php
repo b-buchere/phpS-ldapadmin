@@ -42,6 +42,8 @@ use utilphp;
 use utilphp\util;
 use App\Form\LdapUserbulkType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
+use Translation\Extractor\Visitor\Php\Symfony\FlashMessage;
 /**
  * @Route("/ldapadmin", name="ldapadmin_")
  */
@@ -65,6 +67,7 @@ class LdapAdminController extends BaseController
         
         $this->headerExt->headLink->appendStylesheet("/css/bootstrap.min.css");
         $this->headerExt->headLink->appendStylesheet("/css/sidebar.css");
+        $this->headerExt->headLink->appendStylesheet("/css/all.min.css");
         //$this->headerExt->headLink->appendStylesheet('/fontawesome/css/all.css');
         //$this->headerExt->headLink->appendStylesheet('/css/global.css');
         //$this->headerExt->headLink->appendStylesheet('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700');
@@ -143,9 +146,7 @@ class LdapAdminController extends BaseController
             echo $error->getErrorMessage();
             echo $error->getDiagnosticMessage();
         }
-        
-        dump($this->getUser()->getEntry());
-        dump($this->getUser()->getEntry()->groups()->get());
+
         $tree = new AJAXTree($baseDn);
         if (! $tree){
             die();
@@ -159,7 +160,7 @@ class LdapAdminController extends BaseController
                 ['content-type' => 'text/html']
             );
         }
-        //$treesave = false;
+        
         if ($requestedDn) {
             /**
              * @var TreeItem $entry
@@ -185,7 +186,6 @@ class LdapAdminController extends BaseController
                                   ->in($requestedDn)
                                   ->rawFilter('(|(objectCategory=user)(objectCategory=group)(objectCategory=organizationalUnit))')
                                   ->listing()->get();
-
                 $ldapFunction->LdapDIT($nodeList, $tree, $this->getUser()->getEntry());
             }
 
@@ -200,7 +200,8 @@ class LdapAdminController extends BaseController
         
         return $this->render('ldap/admin/treeitem.html.twig', [
             'baseTree'=>$requestedDn,
-            'tree'=>$dnTree
+            'tree'=>$dnTree,
+            'user' => $this->getUser()
         ]);
     }
     
@@ -339,24 +340,32 @@ class LdapAdminController extends BaseController
             foreach ($records as $record) {
                 
                 $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
-                $group = Group::findBy('CN='.$record['Groupe'].'OU=Groups,OU=TRANSVERSE,DC=ncunml,DC=ass', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
+                $group = Group::find('cn='.$record['Groupe'].',ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
                 
-                if(!is_null($user) && !is_null($group)){
-                    /*$user = (new User)->inside('ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
-                    $user->cn = $record['Prenom'].' '.$record['Nom'];
-                    $user->unicodePwd = '';
-                    $user->samaccountname = strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom']));
-                    $user->mail = $record['email'];
-                    $user->userAccountControl = 512;
-                    $user->pwdlastset = 0;
-                    
+                if(!is_null($user)){                    
                     try {
+                        if(is_null($group)){
+                            $group = (new Group)->inside('ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
+                            $group->cn = $record['Groupe'];
+                            $group->save();
+                        }
+                        if ($user->groups()->attach($group)) {
+                            // Successfully added the group to the user.
+                        }
+                        
                         $user->save();
+                        
+                        return new Response(
+                            "success",
+                            Response::HTTP_OK,
+                            ['content-type' => 'text/html']
+                        );
                     } catch (\LdapRecord\LdapRecordException $e) {
                         // Failed saving user.
-                    }*/
+                    }
+                }else{
+                    $this->addFlash('danger', "L'utilisateur n'existe pas");
                 }
-                
             }
             
             unlink('../uploads/usergroup.csv');

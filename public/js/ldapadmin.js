@@ -1,7 +1,9 @@
 $(document).ready(function() {
     $('#tree').append('<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>');
-    $.ajax("/ldapadmin/tree")
-    .done(function(asyncContent ){
+    $.ajax({
+    	url:"/ldapadmin/tree",
+    	async:true
+   	}).done(function(asyncContent ){
         $('#tree').html(asyncContent);
     })
     
