@@ -1,4 +1,15 @@
 {% block body %}
-<p class="">{% trans %}groupCreate.warning{% endtrans %}</p>
+
+{# Affiche tous les messages flash #}
+{% for type, messages in app.flashes %}
+    <div class="alert bg-{{ type }} {% if type != "info" %}text-white{% endif %}">
+
+    {% for message in messages %}
+        <p class="m-0">
+            {{ message|raw}}
+        </p>
+    {% endfor %}
+    </div>
+{% endfor %}
 {{ form(form) }}
 {% endblock %}

@@ -68,6 +68,7 @@ class LdapAdminController extends BaseController
         $this->headerExt->headLink->appendStylesheet("/css/bootstrap.min.css");
         $this->headerExt->headLink->appendStylesheet("/css/sidebar.css");
         $this->headerExt->headLink->appendStylesheet("/css/all.min.css");
+        $this->headerExt->headLink->appendStylesheet("/css/custom.css");
         //$this->headerExt->headLink->appendStylesheet('/fontawesome/css/all.css');
         //$this->headerExt->headLink->appendStylesheet('/css/global.css');
         //$this->headerExt->headLink->appendStylesheet('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700');
@@ -337,6 +338,8 @@ class LdapAdminController extends BaseController
             
             $records = $csv->getRecords();
             $utilphp = new util();
+            $noUser = [];
+            $error = false;
             foreach ($records as $record) {
                 
                 $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
@@ -354,24 +357,30 @@ class LdapAdminController extends BaseController
                         }
                         
                         $user->save();
-                        
-                        return new Response(
-                            "success",
-                            Response::HTTP_OK,
-                            ['content-type' => 'text/html']
-                        );
                     } catch (\LdapRecord\LdapRecordException $e) {
                         // Failed saving user.
                     }
                 }else{
-                    $this->addFlash('danger', "L'utilisateur n'existe pas");
+                    $error =true;
+                    $noUser[] = $record['Prenom'].' '.$record['Nom'];                    
                 }
             }
             
+            if(!empty($noUser)){
+                $this->addFlash('danger', "Le ou les utilisateur.s suivant.s n'existe.nt pas : <br/>". implode('<br/>',$noUser));
+                
+            }
             unlink('../uploads/usergroup.csv');
+            
+            $this->addFlash('info', "Les utilisateurs ont été mis à jour");
+            if(!$error){
+                return new Response(
+                    ["type"=>"success"],
+                    Response::HTTP_OK,
+                    ['content-type' => 'text/html']
+                );
+            }
         }
-        
-        
         
         return $this->render('ldap/admin/userbulk.html.twig', [
             'form'=>$form->createView()
