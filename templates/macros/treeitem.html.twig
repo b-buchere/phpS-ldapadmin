@@ -3,7 +3,7 @@
         {% for item in items %}
         {% set entry = tree.entries[item] %}
             <li class="nav-item">        
-                                {% if is_granted('create', user) %}
+                {% if is_granted('create', user) %}
                     <a href="#" class="float-end"><i class="fa-solid fa-magnifying-glass"></i></a>
                 {% endif %}
                 {% if not entry.isLeaf %}

@@ -262,5 +262,107 @@ class LdapCustomFunctions
         
         
     }
+    /**
+     *
+     * @param array|\LdapRecord\Models\Entry $nodelist ensemble des noeuds (OU, User, gorups) à parse
+     * @param Tree $tree Arbre hiérarchique
+     * @param User $user Utilisateur connecté
+     */
+    public function requestedDN($nodelist, Tree $tree, User $user){
+        $userGroups = $user->groups();
+        $oUserGroups = $userGroups->get();
+        
+        foreach($nodelist as $node){
+            
+            if($node instanceof Entry){
+                $dn = strtolower($node->getDn());
+            }else {
+                $dn = strtolower($node['dn']);
+                /*$isAuthorized = $this->isUserAuthorized($dn, $oUserGroups, $user);
+                
+                if(!$isAuthorized){
+                continue;
+                }*/
+                $entry = $tree->getBaseEntries()[0];
+                $entry->addChild($dn);
+            }
+            
+            
+            if(!$tree->getEntry($dn)){
+                $tree->addEntry($dn);
+            }
+            
+            $ou = OrganizationalUnit::find($dn);
+            $descendantsOu = $ou->descendants()->get();
+            $users = User::in($dn)->get();
+            $groups = Group::in($dn)->get();
+            
+            /**
+             * @var OrganizationalUnit $node
+             */
+            
+            //if($nodelist){
+            /*    dump($tree);
+             dump($node->getDn());*/
+            //dump($dn);
+            /**
+             * @var TreeItem $entry
+             */
+            $entry = $tree->getEntry($dn);
+            $entry->setParent( $tree->getBaseEntries()[0]->getName() );
+            $ldapOuSanitized = util::sanitize_string($ou->getName());
+            $entry->setSanitizedName($ldapOuSanitized);
+            $entry->setDisplayName($ou->getName());
+            //dump($ou->getName());
+            $childCount = count($descendantsOu) + count($users) + count($groups);
+            if($childCount){
+                
+                foreach($descendantsOu as $child){
+                    
+                    $entry->addChild(strtolower($child->getDn()));
+                    if(!$tree->getEntry($child->getDn())){
+                        $tree->addEntry($child->getDn());
+                    }
+                    
+                    $groups = Group::in($child)->get();
+                    $childCount += count($groups);
+                    if(count($groups)){
+                        
+                        $entryDnGroup = $tree->getEntry($child->getDn());
+                        foreach($groups as $group){
+                            $entryDnGroup->addChild(strtolower($group->getDn()));
+                            if(!$tree->getEntry($group->getDn())){
+                                $tree->addEntry($group->getDn());
+                            }
+                            $entryGroup = $tree->getEntry($group->getDn());
+                            $entryGroup->setDisplayName($group->getName());
+                            $entryGroup->setLeaf();
+                        }
+                        
+                    }
+                    $users = User::in($child)->get();
+                    $childCount += count($users);
+                    if(count($users)){
+                        
+                        $entryDnUser = $tree->getEntry($child->getDn());
+                        foreach($users as $user){
+                            $entryDnUser->addChild(strtolower($user->getDn()));
+                            if(!$tree->getEntry($user->getDn())){
+                                $tree->addEntry($user->getDn());
+                            }
+                            $entryUser = $tree->getEntry($user->getDn());
+                            $entryUser->setDisplayName($user->getName());
+                            $entryUser->setLeaf();
+                        }
+                        
+                    }
+                }
+                
+                $this->LdapDIT($descendantsOu, $tree, $user);
+            }
+        }
+        
+        
+    }
 }
 

@@ -6,6 +6,7 @@ Lister les d�tails
 
 {% block body %}
         {% if is_granted('create', user) %}
+        {% endif %}
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_groupcreate') }}">
             Créer des groupes
         </button>
@@ -15,7 +16,6 @@ Lister les d�tails
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_usergroupupdate') }}">
             Mise à jour des groupes utilisateurs
         </button>
-        {% endif %}
     <div class="position-relative">
         <div id="tree" class="col-3">
     

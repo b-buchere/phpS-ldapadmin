@@ -23,7 +23,6 @@ $(document).ready(function() {
 (function(window, $) {
     window.FormAjax = function ($wrapper) {
         this.$wrapper = $wrapper;
-        //this.helper = new Helper(this.$wrapper);
 
         this.$wrapper.find('form').on(
             'submit',

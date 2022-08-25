@@ -121,8 +121,10 @@ class LdapAdminController extends BaseController
         $baseDn = $this->getParameter('ad_base_dn');
         $user_admin = $this->getParameter('ad_passwordchanger_user');
         $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-        //$requestedDn = strtolower($request->query->get('dn'));
-        $requestedDn = $baseDn; 
+        $requestedDn = $baseDn;
+        if( !empty($request->query->get('dn')) ){
+            $requestedDn = strtolower($request->query->get('dn'));
+        }         
             
         $connection = new Connection([
             'hosts' => [$server],
@@ -148,7 +150,7 @@ class LdapAdminController extends BaseController
             echo $error->getDiagnosticMessage();
         }
 
-        $tree = new AJAXTree($baseDn);
+        $tree = new AJAXTree($requestedDn);
         if (! $tree){
             die();
         }
@@ -188,6 +190,7 @@ class LdapAdminController extends BaseController
                                   ->rawFilter('(|(objectCategory=user)(objectCategory=group)(objectCategory=organizationalUnit))')
                                   ->listing()->get();
                 $ldapFunction->LdapDIT($nodeList, $tree, $this->getUser()->getEntry());
+                
             }
 
         }

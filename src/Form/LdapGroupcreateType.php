@@ -21,7 +21,7 @@ class LdapGroupcreateType extends AbstractType
                 'groupName',
                 TextType::class,
                 [
-                    'label'=>'Nom du groupe',
+                    'label'=>'groupName',
                     'attr'=>[
                         'placeholder'=>'groupName',
                         'class'=>'form-control',

@@ -21,6 +21,18 @@
         <source>Login</source>
         <target>Connexion</target>
       </trans-unit>
+      <trans-unit id="9RYiBjG" resname="Valid">
+        <source>Valid</source>
+        <target>Valider</target>
+      </trans-unit>
+      <trans-unit id="UaRho8B" resname="groupName">
+        <source>groupName</source>
+        <target>Nom du groupe</target>
+      </trans-unit>
+      <trans-unit id="HB5yzRU" resname="groupCreate.warning">
+        <source>groupCreate.warning</source>
+        <target>Les groupes seront créer dans TRANSVERSE</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
