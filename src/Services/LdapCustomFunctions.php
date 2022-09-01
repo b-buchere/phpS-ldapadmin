@@ -272,17 +272,14 @@ class LdapCustomFunctions
         $userGroups = $user->groups();
         $oUserGroups = $userGroups->get();
         
+        dump($nodelist);
         foreach($nodelist as $node){
             
             if($node instanceof Entry){
                 $dn = strtolower($node->getDn());
             }else {
                 $dn = strtolower($node['dn']);
-                /*$isAuthorized = $this->isUserAuthorized($dn, $oUserGroups, $user);
-                
-                if(!$isAuthorized){
-                continue;
-                }*/
+
                 $entry = $tree->getBaseEntries()[0];
                 $entry->addChild($dn);
             }
@@ -293,72 +290,33 @@ class LdapCustomFunctions
             }
             
             $ou = OrganizationalUnit::find($dn);
-            $descendantsOu = $ou->descendants()->get();
-            $users = User::in($dn)->get();
-            $groups = Group::in($dn)->get();
+            $user = User::find($dn);
+            $group = Group::find($dn);
             
-            /**
-             * @var OrganizationalUnit $node
-             */
-            
-            //if($nodelist){
-            /*    dump($tree);
-             dump($node->getDn());*/
-            //dump($dn);
             /**
              * @var TreeItem $entry
              */
             $entry = $tree->getEntry($dn);
             $entry->setParent( $tree->getBaseEntries()[0]->getName() );
-            $ldapOuSanitized = util::sanitize_string($ou->getName());
-            $entry->setSanitizedName($ldapOuSanitized);
-            $entry->setDisplayName($ou->getName());
-            //dump($ou->getName());
-            $childCount = count($descendantsOu) + count($users) + count($groups);
-            if($childCount){
+            if(!is_null($ou)){
                 
-                foreach($descendantsOu as $child){
-                    
-                    $entry->addChild(strtolower($child->getDn()));
-                    if(!$tree->getEntry($child->getDn())){
-                        $tree->addEntry($child->getDn());
-                    }
-                    
-                    $groups = Group::in($child)->get();
-                    $childCount += count($groups);
-                    if(count($groups)){
-                        
-                        $entryDnGroup = $tree->getEntry($child->getDn());
-                        foreach($groups as $group){
-                            $entryDnGroup->addChild(strtolower($group->getDn()));
-                            if(!$tree->getEntry($group->getDn())){
-                                $tree->addEntry($group->getDn());
-                            }
-                            $entryGroup = $tree->getEntry($group->getDn());
-                            $entryGroup->setDisplayName($group->getName());
-                            $entryGroup->setLeaf();
-                        }
-                        
-                    }
-                    $users = User::in($child)->get();
-                    $childCount += count($users);
-                    if(count($users)){
-                        
-                        $entryDnUser = $tree->getEntry($child->getDn());
-                        foreach($users as $user){
-                            $entryDnUser->addChild(strtolower($user->getDn()));
-                            if(!$tree->getEntry($user->getDn())){
-                                $tree->addEntry($user->getDn());
-                            }
-                            $entryUser = $tree->getEntry($user->getDn());
-                            $entryUser->setDisplayName($user->getName());
-                            $entryUser->setLeaf();
-                        }
-                        
-                    }
-                }
+                $ldapOuSanitized = util::sanitize_string($ou->getName());
+                $entry->setSanitizedName($ldapOuSanitized);
+                $entry->setDisplayName($ou->getName());
+            }
+            if(!is_null($user)){
                 
-                $this->LdapDIT($descendantsOu, $tree, $user);
+                $ldapUserSanitized = util::sanitize_string($user->getName());
+                $entry->setSanitizedName($ldapUserSanitized);
+                $entry->setDisplayName($user->getName());
+                $entry->setLeaf();
+            }
+            if(!is_null($group)){
+                
+                $ldapGroupSanitized = util::sanitize_string($group->getName());
+                $entry->setSanitizedName($ldapGroupSanitized);
+                $entry->setDisplayName($group->getName());
+                $entry->setLeaf();
             }
         }
         

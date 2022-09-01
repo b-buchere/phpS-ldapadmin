@@ -20,7 +20,7 @@ class LdapUserFromLdapRecord implements UserInterface, PasswordAuthenticatedUser
     private $roles;
     private $extraFields;
     
-    public function __construct(string $username, Entry $entry)
+    public function __construct(string $username, $password, Entry $entry)
     {
         if (!$username) {
             throw new \InvalidArgumentException('The username cannot be empty.');
@@ -28,7 +28,7 @@ class LdapUserFromLdapRecord implements UserInterface, PasswordAuthenticatedUser
         
         $this->entry = $entry;
         $this->username = $username;
-        //$this->password = $password;
+        $this->password = $password;
         $this->roles = ['ROLE_ALLOWED_TO_SWITCH'];
         $this->extraFields = [];
     }

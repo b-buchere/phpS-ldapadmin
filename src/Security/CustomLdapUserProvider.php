@@ -117,7 +117,7 @@ class CustomLdapUserProvider implements UserProviderInterface, PasswordUpgraderI
             
         } catch (InvalidArgumentException $e) {
         }
-        return new LdapUserFromLdapRecord($identifier, $entry);
+        return new LdapUserFromLdapRecord($identifier, $credentials[1], $entry);
     }
     
     public function refreshUser(UserInterface $user)
@@ -126,7 +126,7 @@ class CustomLdapUserProvider implements UserProviderInterface, PasswordUpgraderI
             throw new UnsupportedUserException(sprintf('Instances of "%s" are not supported.', get_debug_type($user)));
         }
         
-        return new LdapUserFromLdapRecord($user->getUserIdentifier(), $user->getEntry());
+        return new LdapUserFromLdapRecord($user->getUserIdentifier(), $user->getPassword(), $user->getEntry());
     }
     
     /**
@@ -166,9 +166,9 @@ class CustomLdapUserProvider implements UserProviderInterface, PasswordUpgraderI
      *
      * @return UserInterface
      */
-    protected function loadUser(string $identifier, Entry $entry)
+    protected function loadUser(string $identifier, $password, Entry $entry)
     {        
-        return new LdapUser($entry, $identifier, null, $this->defaultRoles, null);
+        return new LdapUser($entry, $identifier, $password, $this->defaultRoles, null);
     }
     
     private function getAttributeValue(Entry $entry, string $attribute)

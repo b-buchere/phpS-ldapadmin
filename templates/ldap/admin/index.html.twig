@@ -1,10 +1,11 @@
-{% extends 'base.html.twig' %}  
+{% extends 'ldap/admin/ldapadmin.base.html.twig' %}  
 
 {% block title %}
 Lister les d�tails
 {% endblock %}
 
 {% block body %}
+
         {% if is_granted('create', user) %}
         {% endif %}
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_groupcreate') }}">

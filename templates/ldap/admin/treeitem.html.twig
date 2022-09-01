@@ -4,9 +4,8 @@
 <div class="position-relative">
     <nav class="mt-2">
         {{ baseTree }}
-        <ul class="nav nav-pills nav-sidebar flex-column ms-2" role="menu" data-accordion="false">
+        <ul class="nav nav-pills nav-sidebar flex-column ms-2"  id="tree" role="menu" data-accordion="false">
             {{ macros.treeitems(tree.entries[baseTree].children, tree, user) }}
-
         </ul>
     </div>
 </div>

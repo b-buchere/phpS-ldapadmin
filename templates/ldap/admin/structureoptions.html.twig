@@ -1,0 +1,4 @@
+{% for dn,structure in structures %}
+{{ dump(loop) }}
+<option value="{{ structure }}">{{ dn }}</option>
+{% endfor %}

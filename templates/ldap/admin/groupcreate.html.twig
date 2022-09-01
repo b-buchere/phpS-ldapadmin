@@ -1,4 +1,8 @@
+{% extends 'ldap/admin/ldapadmin.base.html.twig' %}  
+
 {% block body %}
+<h1>{{ title|trans }}</h1>
+
 <p class="callout callout-warning p-1">{% trans %}groupCreate.warning{% endtrans %}</p>
 {{ form(form) }}
 {% endblock %}

@@ -83,7 +83,6 @@ class LdapAdminController extends BaseController
     {       
 
         $this->initHtmlHead();
-        $this->headerExt->headScript->appendFile('/js/ldapadmin.js');
         
         $server = $this->getParameter('ldap_server');
         //$dn = "OU=Utilisateurs,OU=ALPHA-ORIONIS,DC=ncunml,DC=ass";
@@ -105,6 +104,7 @@ class LdapAdminController extends BaseController
         $query = $connection->query();
         $resultsNode = $query->select()->rawFilter("(objectCategory=organizationalUnit)")->get();
 
+        
         return $this->render('ldap/admin/index.html.twig', [
             'user' => $this->getUser()
         ]);
@@ -174,7 +174,6 @@ class LdapAdminController extends BaseController
                 
                 $tree->addEntry($requestedDn);
                 $entry = $tree->getEntry($requestedDn);
-                //$treesave = true;
             }
 
             if ($baseDn == $requestedDn) {
@@ -189,7 +188,8 @@ class LdapAdminController extends BaseController
                                   ->in($requestedDn)
                                   ->rawFilter('(|(objectCategory=user)(objectCategory=group)(objectCategory=organizationalUnit))')
                                   ->listing()->get();
-                $ldapFunction->LdapDIT($nodeList, $tree, $this->getUser()->getEntry());
+                //$ldapFunction->LdapDIT($nodeList, $tree, $this->getUser()->getEntry());
+                $ldapFunction->requestedDN($nodeList, $tree, $this->getUser()->getEntry());
                 
             }
 
@@ -214,6 +214,8 @@ class LdapAdminController extends BaseController
      */
     public function groupCreate(Request $request): Response
     {       
+        $this->initHtmlHead();
+        
         $form = $this->createForm(LdapGroupcreateType::class, null);
         
         $form->handleRequest($request);
@@ -250,7 +252,8 @@ class LdapAdminController extends BaseController
             $group->save();
         }
         return $this->render('ldap/admin/groupcreate.html.twig', [
-            'form'=>$form->createView()
+            'form'=>$form->createView(),
+            'title'=>"groupCreate"
         ]);
     }
     
@@ -300,167 +303,43 @@ class LdapAdminController extends BaseController
     }
     
     /**
-     * @Route("/usergroupupdate", name="usergroupupdate")
+     * @Route("/getstructureoptions", methods={"POST"}, name="getstructureoptions")
      */
-    public function userGroupUpdate(Request $request): Response
+    public function getStructureOptions(Request $request): Response
     {
-        $form = $this->createForm(LdapUserGroupUpdateType::class, null);
+        $requestedDn = $request->request->get('dn');
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
         
-        $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            /**
-             * @var UploadedFile $file
-             */
-            $file = $data['fileimport'];
-            $file->move('../uploads', 'usergroup.csv');
-            
-            $server = $this->getParameter('ldap_server');
-            $dn = $this->getParameter('ad_base_dn');
-            $user_admin = $this->getParameter('ad_passwordchanger_user');
-            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-            
-            // Create a new connection:
-            $connection = new Connection([
-                'hosts' => [$server],
-                'port' => 389,
-                'base_dn' => $dn,
-                'username' => $user_admin,
-                'password' => $user_pwd,
-                'use_tls'  => true
-            ]);
-            
-            $connection->connect();
-            
-            Container::addConnection($connection);
-            
-            $csv = Reader::createFromPath('../uploads/usergroup.csv', 'r');
-            $csv->setDelimiter(";");
-            $csv->setHeaderOffset(0); //set the CSV header offset
-            
-            $records = $csv->getRecords();
-            $utilphp = new util();
-            $noUser = [];
-            $error = false;
-            foreach ($records as $record) {
-                
-                $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
-                $group = Group::find('cn='.$record['Groupe'].',ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
-                
-                if(!is_null($user)){                    
-                    try {
-                        if(is_null($group)){
-                            $group = (new Group)->inside('ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
-                            $group->cn = $record['Groupe'];
-                            $group->save();
-                        }
-                        if ($user->groups()->attach($group)) {
-                            // Successfully added the group to the user.
-                        }
-                        
-                        $user->save();
-                    } catch (\LdapRecord\LdapRecordException $e) {
-                        // Failed saving user.
-                    }
-                }else{
-                    $error =true;
-                    $noUser[] = $record['Prenom'].' '.$record['Nom'];                    
-                }
-            }
-            
-            if(!empty($noUser)){
-                $this->addFlash('danger', "Le ou les utilisateur.s suivant.s n'existe.nt pas : <br/>". implode('<br/>',$noUser));
-                
-            }
-            unlink('../uploads/usergroup.csv');
-            
-            $this->addFlash('info', "Les utilisateurs ont été mis à jour");
-            if(!$error){
-                return new Response(
-                    ["type"=>"success"],
-                    Response::HTTP_OK,
-                    ['content-type' => 'text/html']
-                );
-            }
-        }
-        
-        return $this->render('ldap/admin/userbulk.html.twig', [
-            'form'=>$form->createView()
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true
         ]);
-    }
-    
-    /**
-     * @Route("/userbulk", name="userbulk")
-     */
-    public function bulkUser(Request $request): Response
-    {
-        $form = $this->createForm(LdapUserbulkType::class, null);
-        
-        $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            /**
-             * @var UploadedFile $file
-             */
-            $file = $data['fileimport'];
-            $file->move('../uploads', 'user.csv');
 
-            $server = $this->getParameter('ldap_server');
-            $dn = $this->getParameter('ad_base_dn');
-            $user_admin = $this->getParameter('ad_passwordchanger_user');
-            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-            
-            // Create a new connection:
-            $connection = new Connection([
-                'hosts' => [$server],
-                'port' => 389,
-                'base_dn' => $dn,
-                'username' => $user_admin,
-                'password' => $user_pwd,
-                'use_tls'  => true
-            ]);
-            
-            $connection->connect();
-            
-            Container::addConnection($connection);
-            
-            $csv = Reader::createFromPath('../uploads/user.csv', 'r');
-            $csv->setDelimiter(";");
-            $csv->setHeaderOffset(0); //set the CSV header offset
-            
-            $records = $csv->getRecords();
-            $utilphp = new util();
-            foreach ($records as $record) {
-                
-                $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
-
-                if(is_null($user)){
-                    $user = (new User)->inside('ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
-                    $user->cn = $record['Prenom'].' '.$record['Nom'];
-                    $user->unicodePwd = '';
-                    $user->samaccountname = strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom']));
-                    $user->mail = $record['email'];
-                    $user->userAccountControl = 512;
-                    $user->pwdlastset = 0;
-                    
-                    try {
-                        $user->save();
-                    } catch (\LdapRecord\LdapRecordException $e) {
-                        // Failed saving user.
-                    }
-                }
-                
-            }
-            
-            unlink('../uploads/user.csv');
+        $connection->connect();
+        
+        Container::addConnection($connection);
+        
+        $query = $connection->query();
+        $nodeList = $query->select(['dn','ou','namingContexts'])
+                        ->in($requestedDn)
+                        ->rawFilter('(objectCategory=organizationalUnit)')
+                        ->listing()->get();
+        
+        $aStructure = [''=>''];
+        foreach($nodeList as $node){
+            $aStructure[$node['ou'][0]] = $node['dn'];
         }
         
-        
-        
-        return $this->render('ldap/admin/userbulk.html.twig', [
-            'form'=>$form->createView()
+        return $this->render('ldap/admin/structureoptions.html.twig', [
+            "structures"=>$aStructure
         ]);
     }
 }

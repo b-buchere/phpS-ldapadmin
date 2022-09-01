@@ -1,5 +1,8 @@
+{% extends 'ldap/admin/ldapadmin.base.html.twig' %}  
+
 {% block body %}
 
+<h1>{{ title|trans }}</h1>
 {# Affiche tous les messages flash #}
 {% for type, messages in app.flashes %}
     <div class="alert bg-{{ type }} {% if type != "info" %}text-white{% endif %}">
@@ -11,5 +14,5 @@
     {% endfor %}
     </div>
 {% endfor %}
-{{ form(form) }}
+{% include 'ldap/admin/formdefault.html.twig'%}
 {% endblock %}

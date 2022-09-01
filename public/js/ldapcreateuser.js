@@ -1,23 +1,19 @@
 'use strict';
 
 $(document).ready(function() {
-    $('#tree').append('<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>');
-    $.ajax({
-    	url:"/ldapadmin/tree",
-    	async:true
-   	}).done(function(asyncContent ){
-        $('#tree').html(asyncContent);
-        var oTree = new treeAjax($('#tree'));
-    })
-    
-    $('#asyncModal').on('show.bs.modal', function (event) {
-        $.ajax(event.relatedTarget.dataset['href'])
-        .done(function(asyncContent ){
-            $('#asyncModal .modal-body').html(asyncContent);
-			var $wrapper = $('#asyncModal .modal-body');
-			var formApp = new FormAjax($wrapper);
+
+	$('#ldap_user_create_region').on('change', function(e){
+        
+        $.ajax({
+            url: "/ldapadmin/getstructureoptions",
+            method: 'POST',
+            data: {
+                dn:$(this)[0].value
+            }
+        }).done(function(asyncContent ){
+            $('#ldap_user_create_structure').html(asyncContent);
         });
-      });
+    });
     
 });
 

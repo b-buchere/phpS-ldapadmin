@@ -33,6 +33,38 @@
         <source>groupCreate.warning</source>
         <target>Les groupes seront créer dans TRANSVERSE</target>
       </trans-unit>
+      <trans-unit id="6rjAnuh" resname="userImport">
+        <source>userImport</source>
+        <target>Importer des utilisateurs</target>
+      </trans-unit>
+      <trans-unit id="iwTmfAi" resname="userGroupImport">
+        <source>userGroupImport</source>
+        <target>Importer des groupes</target>
+      </trans-unit>
+      <trans-unit id="VbXFH4Z" resname="lastname">
+        <source>lastname</source>
+        <target>Nom</target>
+      </trans-unit>
+      <trans-unit id="TP3eab3" resname="firstname">
+        <source>firstname</source>
+        <target>Prénom</target>
+      </trans-unit>
+      <trans-unit id="ckS0ZjJ" resname="fullname">
+        <source>fullname</source>
+        <target>Nom complet</target>
+      </trans-unit>
+      <trans-unit id="FveKfWM" resname="username">
+        <source>username</source>
+        <target>Identifiant</target>
+      </trans-unit>
+      <trans-unit id="ANjT8Rc" resname="mail">
+        <source>mail</source>
+        <target>Courriel</target>
+      </trans-unit>
+      <trans-unit id="hP.dWhx" resname="usercreate.info">
+        <source>usercreate.info</source>
+        <target><![CDATA[Il sera demandé à l'utilisateur le cas échéant et selon les plate-formes de définir un mot de passe.<br/>Ceci peut être fait en amont par l'utilisateur grâce à la fonction de réinitialisation de mot de passe.]]></target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
