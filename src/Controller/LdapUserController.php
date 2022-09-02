@@ -322,12 +322,12 @@ class LdapUserController extends BaseController
         foreach($nodeList as $node){
             $aRegion[$node['ou'][0]] = $node['dn'];
         }
-        dump($aRegion);
         
         $form = $this->createForm(LdapUserCreateType::class, null, [
-            'regions'=>$aRegion
+            'regions'=>$aRegion,
+            'ldap_connection'=>$connection
         ]);
-        
+
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
@@ -336,7 +336,7 @@ class LdapUserController extends BaseController
             $utilphp = new util();
 
             $user = User::findBy('samaccountname', strtolower($form->get('firstname')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('lastname')->getData())));
-            
+
             if(is_null($user)){
                 $user = (new User)->inside($form->get('structure')->getData());
                 $user->cn = $form->get('firstname')->getData().' '.$form->get('lastname')->getData();
@@ -348,6 +348,7 @@ class LdapUserController extends BaseController
                 
                 try {
                     $user->save();
+                    $this->addFlash("success", "userCreated");
                 } catch (\LdapRecord\LdapRecordException $e) {
                     // Failed saving user.
                 }
@@ -357,11 +358,9 @@ class LdapUserController extends BaseController
 
         }
         
-        
-        
         return $this->render('ldap/admin/usercreate.html.twig', [
             'form'=>$form->createView(),
-            'title'=>"userImport"
+            'title'=>"createUser"
         ]);
     }
 }

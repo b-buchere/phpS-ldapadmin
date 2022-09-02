@@ -5,11 +5,11 @@
 <h1>{{ title|trans }}</h1>
 {# Affiche tous les messages flash #}
 {% for type, messages in app.flashes %}
-    <div class="alert bg-{{ type }} {% if type != "info" %}text-white{% endif %}">
+    <div class="alert bg-{% if type == "error" %}danger{% else %}{{ type }}{% endif %} {% if type != "info" %}text-white{% endif %}">
 
     {% for message in messages %}
         <p class="m-0">
-            {{ message|raw}}
+            {{ message|trans|raw}}
         </p>
     {% endfor %}
     </div>
@@ -23,8 +23,6 @@
         {{ form_row(form.lastname) }}
         {{ form_row(form.firstname) }}
         {{ form_row(form.fullname) }}
-        <div class="col-6"></div>
-        {{ form_row(form.username) }}
         <div class="col-6"></div>
         {{ form_row(form.mail) }}
         <div class="col-6"></div>

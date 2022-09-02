@@ -1,12 +1,12 @@
 <div class="col-2 p-0 d-flex flex-column flex-shrink-0 p-3 text-white bg-secondary">
     <ul class="nav nav-pills flex-column mb-auto">
-        <li> Utilisateurs
+        <li class="nav-item"> Utilisateurs
             <ul>
                 <li class="nav-item">
-                    <a href="">Utilisateurs actifs</a>
+                    <a class="nav-link" href="">Utilisateurs actifs</a>
                 </li>
                 <li class="nav-item">
-                    <a href="{{ path('ldapadmin_usercreate') }}">Créer un utilisateur</a>
+                    <a class="nav-link" href="{{ path('ldapadmin_usercreate') }}">Créer un utilisateur</a>
                 </li>
             </ul>
         </li>
@@ -15,10 +15,10 @@
             Groupe
             <ul>
                 <li>
-                    <a href="">Liste des groupes</a>
+                    <a class="nav-link" href="">Liste des groupes</a>
                 </li>
                 <li>
-                    <a href="{{ path('ldapadmin_groupcreate') }}">Créer un groupe</a>
+                    <a class="nav-link" href="{{ path('ldapadmin_groupcreate') }}">Créer un groupe</a>
                 </li>
             </ul>
         </li>
@@ -26,10 +26,10 @@
             Importation
             <ul>
                 <li>
-                    <a href="{{ path('ldapadmin_userbulk') }}">Importations d'utilisateurs</a>
+                    <a class="nav-link" href="{{ path('ldapadmin_userbulk') }}">Importations d'utilisateurs</a>
                 </li>
                 <li>
-                    <a href="{{ path('ldapadmin_usergroupupdate') }}">Importations de groupes</a>
+                    <a class="nav-link" href="{{ path('ldapadmin_usergroupupdate') }}">Importations de groupes</a>
                 </li>
             </ul>
         </li>

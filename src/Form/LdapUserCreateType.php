@@ -4,6 +4,8 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -16,6 +18,43 @@ class LdapUserCreateType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $data = $event->getData();
+            $form = $event->getForm();
+            dump($event);
+            dump($form->getConfig()->getOption('ldap_connection'));
+            $requestedDn = $data['region'];
+            $connection = $form->getConfig()->getOption('ldap_connection');
+            $query = $connection->query();
+            $nodeList = $query->select(['dn','ou','namingContexts'])
+            ->in($requestedDn)
+            ->rawFilter('(objectCategory=organizationalUnit)')
+            ->listing()->get();
+            
+            $aStructure = [''=>''];
+            foreach($nodeList as $node){
+                $aStructure[$node['ou'][0]] = $node['dn'];
+            }
+
+            $form->remove('structure');
+            $form->add(
+                'structure',
+                ChoiceType::class,
+                [
+                    'data'=>$data['structure'],
+                    'choices'=>$aStructure,
+                    'label'=>"structure",
+                    "required"=>true,
+                    'attr'=>[
+                        "placeholder"=>"structure",
+                        'class'=>'form-select'
+                    ],
+                    'row_attr'=>[
+                        'class'=>"col-6"
+                    ],
+                ]
+            );
+        });
 
         $builder->add(
                 'lastname',
@@ -59,19 +98,6 @@ class LdapUserCreateType extends AbstractType
                     ],
                 ]
             )->add(
-                'username',
-                TextType::class,
-                [
-                    'label'=>"username",
-                    'attr'=>[
-                        'class'=>'form-control',
-                        "readonly"=>"readonly"
-                    ],
-                    'row_attr'=>[
-                        'class'=>"col-6"
-                    ],
-                ]
-            )->add(
                 'mail',
                 TextType::class,
                 [
@@ -92,7 +118,7 @@ class LdapUserCreateType extends AbstractType
                     "required"=>true,
                     'attr'=>[
                         "placeholder"=>"structure",
-                        'class'=>'form-control'
+                        'class'=>'form-select'
                     ],
                     'row_attr'=>[
                         'class'=>"col-6"
@@ -107,7 +133,7 @@ class LdapUserCreateType extends AbstractType
                     "required"=>true,
                     'attr'=>[
                         "placeholder"=>"region",
-                        'class'=>'form-control'
+                        'class'=>'form-select'
                     ],
                     'row_attr'=>[
                         'class'=>"col-6"
@@ -131,7 +157,8 @@ class LdapUserCreateType extends AbstractType
     {
         $resolver->setDefaults([
             'csrf_field_name' => '_csrf_token',
-            'regions'=>[]
+            'regions'=>[],
+            'ldap_connection'=>null
 
         ]);
     }

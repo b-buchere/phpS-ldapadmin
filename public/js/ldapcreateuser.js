@@ -2,6 +2,14 @@
 
 $(document).ready(function() {
 
+    var sanitizer = new Sanitizer();
+    $('#ldap_user_create_lastname').on('change', function(e){
+        $('#ldap_user_create_fullname').val($('#ldap_user_create_firstname').val()+' '+$(this).val());
+    });
+
+    $('#ldap_user_create_firstname').on('change', function(e){
+        $('#ldap_user_create_fullname').val($(this).val()+' '+$('#ldap_user_create_lastname').val());
+    });
 	$('#ldap_user_create_region').on('change', function(e){
         
         $.ajax({

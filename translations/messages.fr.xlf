@@ -65,6 +65,118 @@
         <source>usercreate.info</source>
         <target><![CDATA[Il sera demandé à l'utilisateur le cas échéant et selon les plate-formes de définir un mot de passe.<br/>Ceci peut être fait en amont par l'utilisateur grâce à la fonction de réinitialisation de mot de passe.]]></target>
       </trans-unit>
+      <trans-unit id="xpfSmBv" resname="region">
+        <source>region</source>
+        <target>Région</target>
+      </trans-unit>
+      <trans-unit id="FvnrpG8" resname="createUser">
+        <source>createUser</source>
+        <target>Créer un utilisateur</target>
+      </trans-unit>
+      <trans-unit id="UgzbVjv" resname="structure">
+        <source>structure</source>
+        <target>Structure</target>
+      </trans-unit>
+      <trans-unit id="PR1EqHM" resname="CENTRE_VAL_de_LOIRE">
+        <source>CENTRE_VAL_de_LOIRE</source>
+        <target>CENTRE_VAL_de_LOIRE</target>
+      </trans-unit>
+      <trans-unit id="96hASI4" resname="REUNION">
+        <source>REUNION</source>
+        <target>REUNION</target>
+      </trans-unit>
+      <trans-unit id="dUKW5bV" resname="PAYS_DE_LA_LOIRE">
+        <source>PAYS_DE_LA_LOIRE</source>
+        <target>PAYS_DE_LA_LOIRE</target>
+      </trans-unit>
+      <trans-unit id="U9N.seN" resname="BFC">
+        <source>BFC</source>
+        <target>BFC</target>
+      </trans-unit>
+      <trans-unit id="rKLWbeW" resname="NETCOM">
+        <source>NETCOM</source>
+        <target>NETCOM</target>
+      </trans-unit>
+      <trans-unit id="GD07PAP" resname="Debian">
+        <source>Debian</source>
+        <target>Debian</target>
+      </trans-unit>
+      <trans-unit id="n6Coave" resname="IDF">
+        <source>IDF</source>
+        <target>IDF</target>
+      </trans-unit>
+      <trans-unit id="l4xyxxU" resname="PACA">
+        <source>PACA</source>
+        <target>PACA</target>
+      </trans-unit>
+      <trans-unit id="jbaVUhy" resname="AURA">
+        <source>AURA</source>
+        <target>AURA</target>
+      </trans-unit>
+      <trans-unit id="jz6ZSjG" resname="BRETAGNE">
+        <source>BRETAGNE</source>
+        <target>BRETAGNE</target>
+      </trans-unit>
+      <trans-unit id="JJZIoto" resname="NORMANDIE">
+        <source>NORMANDIE</source>
+        <target>NORMANDIE</target>
+      </trans-unit>
+      <trans-unit id="4D8txXS" resname="HAUTS_DE_FRANCE">
+        <source>HAUTS_DE_FRANCE</source>
+        <target>HAUTS_DE_FRANCE</target>
+      </trans-unit>
+      <trans-unit id="YkKuwm8" resname="TRANSVERSE">
+        <source>TRANSVERSE</source>
+        <target>TRANSVERSE</target>
+      </trans-unit>
+      <trans-unit id="TmMLEgc" resname="NOUVELLE_AQUITAINE">
+        <source>NOUVELLE_AQUITAINE</source>
+        <target>NOUVELLE_AQUITAINE</target>
+      </trans-unit>
+      <trans-unit id="fuLlKGS" resname="OCCITANIE">
+        <source>OCCITANIE</source>
+        <target>OCCITANIE</target>
+      </trans-unit>
+      <trans-unit id="FTjjcoI" resname="UNML">
+        <source>UNML</source>
+        <target>UNML</target>
+      </trans-unit>
+      <trans-unit id="IKU8NAi" resname="BLACK_MERIDIAN">
+        <source>BLACK_MERIDIAN</source>
+        <target>BLACK_MERIDIAN</target>
+      </trans-unit>
+      <trans-unit id="H.I7Oab" resname="CORSE">
+        <source>CORSE</source>
+        <target>CORSE</target>
+      </trans-unit>
+      <trans-unit id="TvDMkPB" resname="Domain Controllers">
+        <source>Domain Controllers</source>
+        <target>Domain Controllers</target>
+      </trans-unit>
+      <trans-unit id="44.MxBS" resname="GRAND_EST">
+        <source>GRAND_EST</source>
+        <target>GRAND_EST</target>
+      </trans-unit>
+      <trans-unit id="Lcru0W9" resname="ALPHA-ORIONIS">
+        <source>ALPHA-ORIONIS</source>
+        <target>ALPHA-ORIONIS</target>
+      </trans-unit>
+      <trans-unit id="AFHd8P7" resname="ARML">
+        <source>ARML</source>
+        <target>ARML</target>
+      </trans-unit>
+      <trans-unit id="WawZbv." resname="DIRECTRICE_de_SEINE_OUEST">
+        <source>DIRECTRICE_de_SEINE_OUEST</source>
+        <target>DIRECTRICE_de_SEINE_OUEST</target>
+      </trans-unit>
+      <trans-unit id="6R1ET9A" resname="BIEVRE_VAL_de_MARNE">
+        <source>BIEVRE_VAL_de_MARNE</source>
+        <target>BIEVRE_VAL_de_MARNE</target>
+      </trans-unit>
+      <trans-unit id="zh3ZPeK" resname="userAlreadyExists">
+        <source>userAlreadyExists</source>
+        <target>L'utilisateur existe déjà et ne sera pas créer à nouveau.</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
