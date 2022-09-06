@@ -202,6 +202,7 @@ class LdapUserController extends BaseController
         
         return $this->render('ldap/admin/userbulk.html.twig', [
             'form'=>$form->createView(),
+            'activeMenu'=>"user_group_update",
             'title'=>"userGroupImport"
         ]);
     }
@@ -250,37 +251,66 @@ class LdapUserController extends BaseController
             
             $records = $csv->getRecords();
             $utilphp = new util();
-            foreach ($records as $record) {
-                
-                $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
-
-                if(is_null($user)){
-                    $user = (new User)->inside('ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
-                    $user->cn = $record['Prenom'].' '.$record['Nom'];
-                    $user->unicodePwd = '';
-                    $user->samaccountname = strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom']));
-                    $user->mail = $record['email'];
-                    $user->userAccountControl = 512;
-                    $user->pwdlastset = 0;
+            $lineError = [];
+            $userExists = [];
+            
+            $csvHeader =$csv->getHeader();
+            
+            if(count($csvHeader)<5){
+                $this->addFlash("danger", "fileError");
+                $error = true;
+            }else{
+                foreach ($records as $ligne => $record) {
                     
-                    try {
-                        $user->save();
-                    } catch (\LdapRecord\LdapRecordException $e) {
-                        // Failed saving user.
+                    if( empty($record['Prenom'] || empty($record['Nom'])) ){
+                        $lineError[] = $ligne+1;
+                        continue;
                     }
-                }else{
-                    $this->addFlash("error", "userAlreadyExists");
+                    
+                    $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
+                    
+                    if(is_null($user)){
+                        $user = (new User)->inside('ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
+                        $user->cn = $record['Prenom'].' '.$record['Nom'];
+                        $user->unicodePwd = '';
+                        $user->samaccountname = strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom']));
+                        $user->mail = $record['email'];
+                        $user->userAccountControl = 512;
+                        $user->pwdlastset = 0;
+                        
+                        try {
+                            $user->save();
+                        } catch (\LdapRecord\LdapRecordException $e) {
+                            // Failed saving user.
+                        }
+                    }else{
+                        $userExists[]= $record['Prenom'].' '.$record['Nom'];
+                                               
+                    }
+    
+                }
+                
+                $userExists = array_unique($userExists);
+                $countUserExists = count($userExists);
+                if($countUserExists > 0){
+                    $this->addFlash("danger", "userAlreadyExists,".$countUserExists.",". implode('<br/>', $userExists));
+                }
+                
+                $countLineError = count($lineError);
+                if($countLineError > 0){
+                    $this->addFlash("danger", "fileLineError,".$countLineError.",". implode('<br/>', $lineError));
                 }
                 
             }
-            
             unlink('../uploads/user.csv');
+            
+            $this->addFlash('info', "Les utilisateurs validé ont été créés");
         }
-        
         
         
         return $this->render('ldap/admin/userbulk.html.twig', [
             'form'=>$form->createView(),
+            'activeMenu' => "user_import",
             'title'=>"userImport"
         ]);
     }
@@ -360,6 +390,7 @@ class LdapUserController extends BaseController
         
         return $this->render('ldap/admin/usercreate.html.twig', [
             'form'=>$form->createView(),
+            "activeMenu" =>"user_create",
             'title'=>"createUser"
         ]);
     }

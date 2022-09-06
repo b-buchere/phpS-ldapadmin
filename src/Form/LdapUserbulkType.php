@@ -19,7 +19,7 @@ class LdapUserbulkType extends AbstractType
                 'fileimport',
                 FileType::class,
                 [
-                    'label'=>"Fichier à importer",
+                    'label'=>"fileimport",
                     'attr'=>[
                         'placeholder'=>'file',
                         'class'=>'form-control',
@@ -30,6 +30,7 @@ class LdapUserbulkType extends AbstractType
                     'constraints' => [
                         new File([
                             'mimeTypes' => [
+                                'text/plain',
                                 'text/csv'
                             ],
                             'mimeTypesMessage' => 'Veuillez choisir un document csv',

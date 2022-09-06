@@ -253,6 +253,7 @@ class LdapAdminController extends BaseController
         }
         return $this->render('ldap/admin/groupcreate.html.twig', [
             'form'=>$form->createView(),
+            "activeMenu"=>"group_create",
             'title'=>"groupCreate"
         ]);
     }

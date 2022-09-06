@@ -3,13 +3,22 @@
 {% block body %}
 
 <h1>{{ title|trans }}</h1>
+
 {# Affiche tous les messages flash #}
 {% for type, messages in app.flashes %}
+
     <div class="alert bg-{{ type }} {% if type != "info" %}text-white{% endif %}">
 
     {% for message in messages %}
         <p class="m-0">
-            {{ message|raw}}
+        
+            {% if ',' in message %}
+                {% set messageSplit = message|split(',') %}
+                {{ messageSplit[0]|trans({'%count%': messageSplit[1]})|raw}}<br/>
+                {{ messageSplit[2]|raw}}
+            {% else %}
+                {{ message|trans|raw}}
+            {% endif %}
         </p>
     {% endfor %}
     </div>
