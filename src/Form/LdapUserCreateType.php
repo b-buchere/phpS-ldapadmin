@@ -114,6 +114,7 @@ class LdapUserCreateType extends AbstractType
                 'structure',
                 ChoiceType::class,
                 [
+                    'choices'=>array(),
                     'label'=>"structure",
                     "required"=>true,
                     'attr'=>[
@@ -128,7 +129,7 @@ class LdapUserCreateType extends AbstractType
                 'region',
                 ChoiceType::class,
                 [
-                    'choices'=>$options['regions'],
+                    'choices'=>[],
                     'label'=>"region",
                     "required"=>true,
                     'attr'=>[
@@ -157,7 +158,7 @@ class LdapUserCreateType extends AbstractType
     {
         $resolver->setDefaults([
             'csrf_field_name' => '_csrf_token',
-            'regions'=>[],
+            'regions'=>array(),
             'ldap_connection'=>null
 
         ]);

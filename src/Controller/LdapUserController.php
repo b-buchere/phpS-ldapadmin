@@ -45,6 +45,8 @@ use App\Form\LdapUserbulkType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Translation\Extractor\Visitor\Php\Symfony\FlashMessage;
+use Psr\Log\LoggerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 /**
  * @Route("/ldapadmin", name="ldapadmin_")
  */
@@ -210,7 +212,7 @@ class LdapUserController extends BaseController
     /**
      * @Route("/userbulk", name="userbulk")
      */
-    public function bulkUser(Request $request): Response
+    public function bulkUser(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): Response
     {
         $this->initHtmlHead();
         
@@ -219,6 +221,7 @@ class LdapUserController extends BaseController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
+            $logger->info($tsl->trans("bulUserProcessStart"));
             $data = $form->getData();
             /**
              * @var UploadedFile $file
@@ -255,15 +258,21 @@ class LdapUserController extends BaseController
             $userExists = [];
             
             $csvHeader =$csv->getHeader();
+            $userTotal = $csv->count();
+            $userAdded = 0;
+            $userError = 0;
             
             if(count($csvHeader)<5){
                 $this->addFlash("danger", "fileError");
-                $error = true;
+                $logger->error($tsl->trans("fileError"));
             }else{
+                $logger->info($tsl->trans("userTotal").$userTotal);
                 foreach ($records as $ligne => $record) {
                     
                     if( empty($record['Prenom'] || empty($record['Nom'])) ){
                         $lineError[] = $ligne+1;
+                        $logger->error($tsl->trans("userAddError").implode(", ".$record));
+                        $userError++;
                         continue;
                     }
                     
@@ -280,31 +289,40 @@ class LdapUserController extends BaseController
                         
                         try {
                             $user->save();
+                            $userAdded++;
+                            $logger->info($tsl->trans("userAdded").$userAdded);
                         } catch (\LdapRecord\LdapRecordException $e) {
                             // Failed saving user.
+                            $userError++;
+                            $logger->error($tsl->trans("userAddError").implode(", ".$record));
                         }
                     }else{
                         $userExists[]= $record['Prenom'].' '.$record['Nom'];
                                                
                     }
+                    
     
                 }
                 
                 $userExists = array_unique($userExists);
                 $countUserExists = count($userExists);
                 if($countUserExists > 0){
+                    $logger->error($tsl->trans("userAlreadyExists" , ["count"=>$countUserExists]).implode(', ', $userExists));
                     $this->addFlash("danger", "userAlreadyExists,".$countUserExists.",". implode('<br/>', $userExists));
                 }
                 
                 $countLineError = count($lineError);
                 if($countLineError > 0){
+                    $logger->error($tsl->trans("fileLineError").implode(', ', $lineError));
                     $this->addFlash("danger", "fileLineError,".$countLineError.",". implode('<br/>', $lineError));
                 }
                 
             }
             unlink('../uploads/user.csv');
             
-            $this->addFlash('info', "Les utilisateurs validé ont été créés");
+            $logger->info($tsl->trans("userAdded").$userAdded);
+            $logger->info($tsl->trans("userBulkProcessEnd").$userAdded);
+            $this->addFlash('info', "validatedUsersCreated");
         }
         
         

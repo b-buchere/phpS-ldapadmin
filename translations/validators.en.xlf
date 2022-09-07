@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" version="1.2">
+  <file source-language="fr" target-language="en" datatype="plaintext" original="file.ext">
+    <header>
+      <tool tool-id="symfony" tool-name="Symfony"/>
+    </header>
+    <body>
+      <trans-unit id="la5or9T" resname="Veuillez choisir un document csv">
+        <source>Veuillez choisir un document csv</source>
+        <target></target>
+        <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:35</note>
+        <note priority="1">sambaldap\src\Form\LdapUserbulkType.php:36</note>
+        <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:35</note>
+        <note priority="1">sambaldap\src\Form\LdapUserbulkType.php:36</note>
+        <note priority="1">new</note>
+      </trans-unit>
+    </body>
+  </file>
+</xliff>

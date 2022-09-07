@@ -50,6 +50,9 @@
     "egulias/email-validator": {
         "version": "3.2"
     },
+    "evotodi/log-viewer-bundle": {
+        "version": "5.4.1"
+    },
     "friendsofphp/proxy-manager-lts": {
         "version": "v1.0.12"
     },
@@ -67,33 +70,6 @@
     },
     "nikic/php-parser": {
         "version": "v4.14.0"
-    },
-    "nyholm/nsa": {
-        "version": "1.3.0"
-    },
-    "php-translation/common": {
-        "version": "3.2.0"
-    },
-    "php-translation/extractor": {
-        "version": "2.1.0"
-    },
-    "php-translation/symfony-bundle": {
-        "version": "0.12",
-        "recipe": {
-            "repo": "github.com/symfony/recipes-contrib",
-            "branch": "main",
-            "version": "0.10",
-            "ref": "f3ca4e4da63897d177e58da78626c20648c0e102"
-        },
-        "files": [
-            "./config/packages/dev/php_translation.yaml",
-            "./config/packages/php_translation.yaml",
-            "./config/routes/dev/php_translation.yaml",
-            "./config/routes/php_translation.yaml"
-        ]
-    },
-    "php-translation/symfony-storage": {
-        "version": "2.3.1"
     },
     "phpdocumentor/reflection-common": {
         "version": "2.2.0"

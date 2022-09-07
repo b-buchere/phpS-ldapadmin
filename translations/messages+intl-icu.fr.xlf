@@ -178,7 +178,7 @@
       </trans-unit>
       <trans-unit id="zh3ZPeK" resname="userAlreadyExists">
         <source>userAlreadyExists</source>
-        <target>{count, plural, =1 {L'utilisateur suivant existe déjà et ne sera pas créer à nouveau.} other {Les utilisateurs suivants existent déjà et ne seront pas créer à nouveau.}}</target>
+        <target>{count, plural, =1 {L'utilisateur suivant existe déjà et ne sera pas créer à nouveau : } other {Les utilisateurs suivants existent déjà et ne seront pas créer à nouveau : }}</target>
         <note priority="1">sambaldap\src\Controller\LdapUserController.php:378</note>
         <note priority="1">obsolete</note>
       </trans-unit>
@@ -341,6 +341,30 @@
         <target><![CDATA[Il sera demandé à l'utilisateur le cas échéant et selon les plate-formes de définir un mot de passe.<br/>Ceci peut être fait en amont par l'utilisateur grâce à la fonction de réinitialisation de mot de passe.]]></target>
         <note priority="1">sambaldap\templates\ldap\admin\usercreate.html.twig:32</note>
         <note priority="1">obsolete</note>
+      </trans-unit>
+      <trans-unit id="HUXlsAT" resname="bulUserProcessStart">
+        <source>bulUserProcessStart</source>
+        <target>début du tratiement du fichier utilisateur</target>
+      </trans-unit>
+      <trans-unit id="IQZdtFD" resname="userTotal">
+        <source>userTotal</source>
+        <target>Utilisateurs présents dans le fichier csv</target>
+      </trans-unit>
+      <trans-unit id="siOV5tx" resname="userAddError">
+        <source>userAddError</source>
+        <target>Utilisateurs en erreur</target>
+      </trans-unit>
+      <trans-unit id="nPUJ1qn" resname="userAdded">
+        <source>userAdded</source>
+        <target>Utilisateur.s créé.s</target>
+      </trans-unit>
+      <trans-unit id="qM2t63s" resname="userBulkProcessEnd">
+        <source>userBulkProcessEnd</source>
+        <target>Fin du traitement du fichier utilisateur</target>
+      </trans-unit>
+      <trans-unit id="e2fimwS" resname="validatedUsersCreated">
+        <source>validatedUsersCreated</source>
+        <target>Les utilisateurs validés ont été créés</target>
       </trans-unit>
     </body>
   </file>
