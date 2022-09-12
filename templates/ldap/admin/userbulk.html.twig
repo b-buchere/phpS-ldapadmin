@@ -24,4 +24,21 @@
     </div>
 {% endfor %}
 {% include 'ldap/admin/formdefault.html.twig'%}
+<div class="border-top border-dark border-2 py-3" id="importProgress">
+    <h1>{{ "importProgress"|trans }}</h1>
+    
+    <div class="progress">
+      <div class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+    </div>    
+
+</div>
+
+<div class="border-top border-dark border-2" id="reportProgress">
+    <h1>{{ "reportProgress"|trans }}</h1>
+    
+    <div class="reportBody">
+    </div>
+
+</div>
+
 {% endblock %}

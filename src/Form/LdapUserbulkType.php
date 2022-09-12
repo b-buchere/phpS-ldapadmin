@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LdapUserbulkType extends AbstractType
 {
@@ -27,6 +28,10 @@ class LdapUserbulkType extends AbstractType
                     'row_attr'=>[
                         'class'=>""
                     ],
+                    'help'=>'<span class="spinner-border spinner-border-sm" role="status"></span> <span>'.$options['help_message'].'</span>',
+                    'help_attr'=>['class'=>"m-0 mb-1 invisible"],
+                    "help_html"=>true,
+                    'translation_domain'=>false,
                     'constraints' => [
                         new File([
                             'mimeTypes' => [
@@ -38,9 +43,10 @@ class LdapUserbulkType extends AbstractType
                     ]
                 ]
                 )->add(
-                    'valid',
+                    'import',
                     SubmitType::class,
                     [
+                        'label'=>'import',
                         'row_attr'=>[
                             'class'=>""
                         ],
@@ -54,8 +60,8 @@ class LdapUserbulkType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'csrf_field_name' => '_csrf_token'
-
+            'csrf_field_name' => '_csrf_token',
+            'help_message'=>""
         ]);
     }
 }

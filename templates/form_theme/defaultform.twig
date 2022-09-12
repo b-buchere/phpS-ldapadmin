@@ -1,0 +1,28 @@
+{% use 'bootstrap_5_layout.html.twig' %}
+
+{%- block form_widget_compound -%}
+    <h2 class="combined-header">Connexion</h2>
+    <div {{ block('widget_container_attributes') }} class="fields">
+        {%- if form is rootform -%}
+        {{ form_errors(form) }}
+        {%- endif -%}
+        {{- block('form_rows') -}}
+        {{- form_rest(form) -}}
+    </div>
+    <div class="row form-footer">
+        <div class="d-grid submit-btn m-0 col-6">
+            <button type="submit" class="btn btn-primary" name="login[login]">
+                <span class="icon-user"></span><span>Connexion</span>
+            </button>
+        </div>
+        <div class="text-center col-6 emptyspace-biseau position-relative">
+            <div class="form-emptyspace">
+                <div class="checkbox">
+                    <label for="remember">Se rappeler de moi</label>                    
+                    <input id="remember" type="checkbox" name="remember" class="inputbox" value="yes">                     
+                </div>
+                <a href="/resetpwd"> Mot de passe oublié ?</a> &nbsp; <a class="d-none" href="/remind"> Identifiant oublié ?</a>
+            </div>
+        </div>
+    </div>
+{%- endblock form_widget_compound -%}

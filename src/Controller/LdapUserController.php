@@ -5,9 +5,6 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Form\LdapGetinfoType;
-use App\Form\LdapGroupcreateType;
-use App\Form\LdapOucreateType;
 use App\Form\LdapUserCreateType;
 use App\Form\LdapUserGroupUpdateType;
 use App\Form\PasswordChangeRequestType;
@@ -38,13 +35,10 @@ use App\Services\TreeItem;
 use App\Services\LdapCustomFunctions;
 use App\Security\Voter\UserVoter;
 use League\Csv\Reader;
-use League\Csv\Statement;
-use utilphp;
 use utilphp\util;
 use App\Form\LdapUserbulkType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Translation\Extractor\Visitor\Php\Symfony\FlashMessage;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 /**
@@ -215,8 +209,8 @@ class LdapUserController extends BaseController
     public function bulkUser(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): Response
     {
         $this->initHtmlHead();
-        
-        $form = $this->createForm(LdapUserbulkType::class, null);
+        $this->headerExt->headScript->appendFile('/js/ldapbulkuser.js');
+        $form = $this->createForm(LdapUserbulkType::class, null, ['help_message'=>$tsl->trans("fileimportVerifyProgress")]);
         
         $form->handleRequest($request);
         
@@ -267,12 +261,17 @@ class LdapUserController extends BaseController
                 $logger->error($tsl->trans("fileError"));
             }else{
                 $logger->info($tsl->trans("userTotal").$userTotal);
+                $session = $request->getSession();
+                $session->set('importProgress', 0);
+                $aSessionMessages=[];
                 foreach ($records as $ligne => $record) {
+                    $session->set('importProgress', floor($userTotal/$ligne*100));
                     
                     if( empty($record['Prenom'] || empty($record['Nom'])) ){
                         $lineError[] = $ligne+1;
                         $logger->error($tsl->trans("userAddError").implode(", ".$record));
                         $userError++;
+                        $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userLineNotAdded", ['line'=>$ligne])];
                         continue;
                     }
                     
@@ -295,34 +294,45 @@ class LdapUserController extends BaseController
                             // Failed saving user.
                             $userError++;
                             $logger->error($tsl->trans("userAddError").implode(", ".$record));
+                            $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotAdded", ['name'=>$record['Prenom'].' '.$record['Nom']])];
                         }
                     }else{
                         $userExists[]= $record['Prenom'].' '.$record['Nom'];
+                        $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotAdded", ['name'=>$record['Prenom'].' '.$record['Nom']])];
                                                
-                    }
-                    
+                    }                    
     
-                }
+                }                
+                
+                $session->set('importProgress', 100);
                 
                 $userExists = array_unique($userExists);
                 $countUserExists = count($userExists);
                 if($countUserExists > 0){
                     $logger->error($tsl->trans("userAlreadyExists" , ["count"=>$countUserExists]).implode(', ', $userExists));
-                    $this->addFlash("danger", "userAlreadyExists,".$countUserExists.",". implode('<br/>', $userExists));
+                    //$this->addFlash("danger", "userAlreadyExists,".$countUserExists.",". implode('<br/>', $userExists));
                 }
                 
                 $countLineError = count($lineError);
                 if($countLineError > 0){
                     $logger->error($tsl->trans("fileLineError").implode(', ', $lineError));
-                    $this->addFlash("danger", "fileLineError,".$countLineError.",". implode('<br/>', $lineError));
+                    //$this->addFlash("danger", "fileLineError,".$countLineError.",". implode('<br/>', $lineError));
                 }
                 
             }
             unlink('../uploads/user.csv');
             
             $logger->info($tsl->trans("userAdded").$userAdded);
-            $logger->info($tsl->trans("userBulkProcessEnd").$userAdded);
-            $this->addFlash('info', "validatedUsersCreated");
+            $logger->info($tsl->trans("userBulkProcessEnd"));
+            //$this->addFlash('info', "validatedUsersCreated");
+            $aSessionMessages[] = ['type'=>'success','icon'=>'fa-sharp fa-solid fa-check','message'=>$tsl->trans("validatedUsersCreated")];
+            $aSessionMessages[] = ['type'=>'success','icon'=>'fa-sharp fa-solid fa-check','message'=>$tsl->trans("userTotal", ["nombre"=>$userTotal])];
+            $aSessionMessages[] = ['type'=>'success','icon'=>'fa-sharp fa-solid fa-check','message'=>$tsl->trans("userAdded", ["nombre"=>$userAdded])];
+            if(!empty($userError )){
+                $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userCountNotAdded", ["nombre"=>$userError])];
+            }
+            
+            $session->set('reportImport', $aSessionMessages);
         }
         
         
@@ -331,6 +341,76 @@ class LdapUserController extends BaseController
             'activeMenu' => "user_import",
             'title'=>"userImport"
         ]);
+    }
+
+    /**
+     * @Route("/userbulk/verifyfile", name="bulkUserVerifyFile")
+     */
+    public function bulkUserVerifyFile(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
+    {
+
+        $form = $this->createForm(LdapUserbulkType::class, null);
+        
+        $form->handleRequest($request);
+        dump($form->getErrors(true));
+        $response = new JsonResponse();
+        if ($form->isSubmitted() && $form->isValid()) {
+            $logger->info($tsl->trans("bulkUserVerifyFile"));
+            $data = $form->getData();
+            /**
+             * @var UploadedFile $file
+             */
+            $file = $data['fileimport'];
+            dump($file);
+            $file->move('../uploads', 'user.csv');
+
+            $csv = Reader::createFromPath('../uploads/user.csv', 'r');
+            $csv->setDelimiter(";");
+            $csv->setHeaderOffset(0); //set the CSV header offset
+            
+            $csvHeader =$csv->getHeader();
+
+            $response->setData(['type'=>"success", "message"=>$tsl->trans("fileVerified")]);
+            if(count($csvHeader)<5){
+                $this->addFlash("danger", "fileError");
+                $logger->error($tsl->trans("fileError"));
+                $response->setData(['type'=>"danger", "message"=>$tsl->trans("fileError")]);
+                return $response;
+            }
+            unlink('../uploads/user.csv');
+
+            
+            return $response;
+        }        
+        
+        $response->setData(['type'=>"danger", "message"=>$tsl->trans("fileError")]);
+        return $response;
+    }
+    
+    /**
+     * @Route("/userbulk/progress", name="bulkUserProgress")
+     */
+    public function bulkUserProgress(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
+    {
+        $response = new JsonResponse();
+            
+        $session = $request->getSession();
+        $importProgress = $session->get('importProgress');
+        dump($session->get('reportImport'));
+        $response->setData(
+            [
+                'progress'=>$importProgress,
+                'dataRender'=>$this->renderView('ldap/admin/reportImport.html.twig',
+                [
+                    'messages'=>$session->get('reportImport')
+                ])
+            ]);
+        
+        if($importProgress >= 100){
+            $session->remove('importProgress');
+        }
+        
+        return $response;
     }
     
     /**

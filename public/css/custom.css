@@ -56,3 +56,7 @@
 .callout.callout-success {
   border-left-color: #1e7e34;
 }
+
+.progress{
+  height:20px
+}

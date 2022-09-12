@@ -159,7 +159,7 @@
       </trans-unit>
       <trans-unit id="LNA3I2k" resname="fileError">
         <source>fileError</source>
-        <target>Le format du fichier n'est pas celui attendu</target>
+        <target state="translated">Le fichier CSV n'est pas conforme</target>
         <note priority="1">sambaldap\src\Controller\LdapUserController.php:259</note>
       </trans-unit>
       <trans-unit id="2ql77OB" resname="fileLineError">
@@ -344,7 +344,7 @@
       </trans-unit>
       <trans-unit id="HUXlsAT" resname="bulUserProcessStart">
         <source>bulUserProcessStart</source>
-        <target>début du tratiement du fichier utilisateur</target>
+        <target state="translated">Début du traitement du fichier utilisateur</target>
       </trans-unit>
       <trans-unit id="IQZdtFD" resname="userTotal">
         <source>userTotal</source>
@@ -365,6 +365,42 @@
       <trans-unit id="e2fimwS" resname="validatedUsersCreated">
         <source>validatedUsersCreated</source>
         <target>Les utilisateurs validés ont été créés</target>
+      </trans-unit>
+      <trans-unit id="F_c5qdm" resname="bulkUserVerifyFile">
+        <source>bulkUserVerifyFile</source>
+        <target state="translated">Vérification de fichier d'import utilisateur</target>
+      </trans-unit>
+      <trans-unit id="7i493ms" resname="fileVerified">
+        <source>fileVerified</source>
+        <target state="translated">Le fichier CSV est conforme</target>
+      </trans-unit>
+      <trans-unit id="wYoHb6T" resname="fileimportVerifyProgress">
+        <source>fileimportVerifyProgress</source>
+        <target state="translated">Vérification du fichier CSV en cours. Veuillez patienter</target>
+      </trans-unit>
+      <trans-unit id="2UL2SIZ" resname="import">
+        <source>import</source>
+        <target state="translated">Importer</target>
+      </trans-unit>
+      <trans-unit id="SrDo8gS" resname="importProgress">
+        <source>importProgress</source>
+        <target state="translated">État de l'importation</target>
+      </trans-unit>
+      <trans-unit id="0QpRL0Y" resname="reportProgress">
+        <source>reportProgress</source>
+        <target state="translated">Rapport de l'importation</target>
+      </trans-unit>
+      <trans-unit id="8esCtvq" resname="userLineNotAdded">
+        <source>userLineNotAdded</source>
+        <target>__userLineNotAdded</target>
+      </trans-unit>
+      <trans-unit id="tEtXHct" resname="userNotAdded">
+        <source>userNotAdded</source>
+        <target>__userNotAdded</target>
+      </trans-unit>
+      <trans-unit id="AKBJgM4" resname="userCountNotAdded">
+        <source>userCountNotAdded</source>
+        <target>__userCountNotAdded</target>
       </trans-unit>
     </body>
   </file>
