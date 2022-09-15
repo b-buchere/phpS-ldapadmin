@@ -41,6 +41,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 /**
  * @Route("/ldapadmin", name="ldapadmin_")
  */
@@ -210,6 +211,7 @@ class LdapUserController extends BaseController
     {
         $this->initHtmlHead();
         $this->headerExt->headScript->appendFile('/js/ldapbulkuser.js');
+        dump($tsl->trans("fileimportVerifyProgress"));
         $form = $this->createForm(LdapUserbulkType::class, null, ['help_message'=>$tsl->trans("fileimportVerifyProgress")]);
         
         $form->handleRequest($request);
@@ -299,7 +301,7 @@ class LdapUserController extends BaseController
                     }else{
                         $userExists[]= $record['Prenom'].' '.$record['Nom'];
                         $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotAdded", ['name'=>$record['Prenom'].' '.$record['Nom']])];
-                                               
+                        $userError++;                       
                     }                    
     
                 }                
@@ -322,7 +324,7 @@ class LdapUserController extends BaseController
             }
             unlink('../uploads/user.csv');
             
-            $logger->info($tsl->trans("userAdded").$userAdded);
+            $logger->info($tsl->trans("userAdded", ["nombre"=>$userAdded]));
             $logger->info($tsl->trans("userBulkProcessEnd"));
             //$this->addFlash('info', "validatedUsersCreated");
             $aSessionMessages[] = ['type'=>'success','icon'=>'fa-sharp fa-solid fa-check','message'=>$tsl->trans("validatedUsersCreated")];
@@ -396,7 +398,7 @@ class LdapUserController extends BaseController
             
         $session = $request->getSession();
         $importProgress = $session->get('importProgress');
-        dump($session->get('reportImport'));
+        
         $response->setData(
             [
                 'progress'=>$importProgress,
@@ -410,6 +412,31 @@ class LdapUserController extends BaseController
             $session->remove('importProgress');
         }
         
+        return $response;
+    }
+    
+    /**
+     * @Route("/userbulk/report", name="bulkUser_report")
+     */
+    public function bulkUserReport(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): BinaryFileResponse
+    {
+        $session = $request->getSession();
+        
+        $aRows = [];
+        foreach($session->get('reportImport') as $reportLine){
+            unset($reportLine['icon']);
+            $aRows[]=implode(',',$reportLine);
+            
+        }
+        $content = implode("\n", $aRows);
+        file_put_contents("report.csv", utf8_decode($content));
+        
+        $response = new BinaryFileResponse("report.csv");
+        $response->setCharset('ISO-8859-2');
+        $response->headers->set('Content-Type', 'text/csv');
+        $response->headers->set('Content-Disposition', 'attachment; filename="report.csv"');
+        $response->prepare($request);
+        unlink("report.csv");
         return $response;
     }
     

@@ -33,9 +33,9 @@
 
 </div>
 
-<div class="border-top border-dark border-2" id="reportProgress">
-    <h1>{{ "reportProgress"|trans }}</h1>
-    
+<div class="border-top border-dark border-2 py-2" id="reportProgress">
+    <h1>{{ "reportProgress"|trans }}<a id="reportDl" class="btn btn-outline-primary float-end" href="{{ path('ldapadmin_bulkUser_report') }}">{{ 'dlReport' |trans }}</a></h1>
+
     <div class="reportBody">
     </div>
 

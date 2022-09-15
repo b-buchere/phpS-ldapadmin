@@ -21,8 +21,7 @@ class LdapUserCreateType extends AbstractType
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
             $data = $event->getData();
             $form = $event->getForm();
-            dump($event);
-            dump($form->getConfig()->getOption('ldap_connection'));
+            
             $requestedDn = $data['region'];
             $connection = $form->getConfig()->getOption('ldap_connection');
             $query = $connection->query();

@@ -152,7 +152,7 @@
       </trans-unit>
       <trans-unit id="fa.af1v" resname="Les utilisateurs ont été mis à jour">
         <source>Les utilisateurs ont été mis à jour</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Controller\LdapUserController.php:193</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -171,7 +171,7 @@
       </trans-unit>
       <trans-unit id="muHUtz7" resname="userCreated">
         <source>userCreated</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Controller\LdapUserController.php:373</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -217,21 +217,21 @@
       </trans-unit>
       <trans-unit id="tMwZk9m" resname="Nom de l'OU">
         <source>Nom de l'OU</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\LdapOucreateType.php:23</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="qoGpg2r" resname="ouName">
         <source>ouName</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\LdapOucreateType.php:26</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="47DEQpj" resname="">
-        <source></source>
-        <target></target>
+        <source/>
+        <target/>
       </trans-unit>
       <trans-unit id="UgzbVjv" resname="structure">
         <source>structure</source>
@@ -278,7 +278,7 @@
       </trans-unit>
       <trans-unit id="uecbvpy" resname="Fichier à importer">
         <source>Fichier à importer</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:21</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -311,21 +311,21 @@
       </trans-unit>
       <trans-unit id="pbSAYgl" resname="New password cnfm">
         <source>New password cnfm</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\PasswordChangePromptType.php:17</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="PdnfREH" resname="New password">
         <source>New password</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\PasswordChangePromptType.php:17</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="szwn32b" resname="Adresse email">
         <source>Adresse email</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\PasswordChangeRequestType.php:19</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -348,7 +348,7 @@
       </trans-unit>
       <trans-unit id="IQZdtFD" resname="userTotal">
         <source>userTotal</source>
-        <target>Utilisateurs présents dans le fichier csv</target>
+        <target state="translated">Utilisateurs présents dans le fichier csv : {nombre}</target>
       </trans-unit>
       <trans-unit id="siOV5tx" resname="userAddError">
         <source>userAddError</source>
@@ -356,7 +356,7 @@
       </trans-unit>
       <trans-unit id="nPUJ1qn" resname="userAdded">
         <source>userAdded</source>
-        <target>Utilisateur.s créé.s</target>
+        <target state="translated">Nombre d'utilisateurs importés : {nombre}</target>
       </trans-unit>
       <trans-unit id="qM2t63s" resname="userBulkProcessEnd">
         <source>userBulkProcessEnd</source>
@@ -392,15 +392,19 @@
       </trans-unit>
       <trans-unit id="8esCtvq" resname="userLineNotAdded">
         <source>userLineNotAdded</source>
-        <target>__userLineNotAdded</target>
+        <target>L'utilisateurs à la ligne {line} ne peut être importés</target>
       </trans-unit>
       <trans-unit id="tEtXHct" resname="userNotAdded">
         <source>userNotAdded</source>
-        <target>__userNotAdded</target>
+        <target>L'utilisateur {name} n'a pas été importé</target>
       </trans-unit>
       <trans-unit id="AKBJgM4" resname="userCountNotAdded">
         <source>userCountNotAdded</source>
-        <target>__userCountNotAdded</target>
+        <target state="translated">Nombre d'utilisateurs non importés : {nombre}</target>
+      </trans-unit>
+      <trans-unit id="mVIuW6Y" resname="dlReport">
+        <source>dlReport</source>
+        <target state="translated">Télécharger le rapport</target>
       </trans-unit>
     </body>
   </file>
