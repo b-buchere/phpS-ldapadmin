@@ -1,0 +1,41 @@
+{% extends 'ldap/admin/ldapadmin.base.html.twig' %}  
+
+{% block body %}
+
+<h1>{{ title|trans }}</h1>
+
+<script src="//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
+
+<div class="row gx-4 m-0">
+
+    
+    <div class="pb-2">
+        <a href="{{ path('ldapadmin_usercreate') }}">{{ 'createUser'|trans }}</a>
+    </div> 
+    <div id="table_user"></div>
+    {{ sg_datatables_render(datatable) }}
+</div>
+<script>
+
+$(document).ready(function(){
+
+    /*$('dataTable').dataTable( {
+        serverSide: true,
+        ajax: {
+            url: '/admin/product/dtProduct',
+            type: 'POST'
+        }
+    } );*/
+    
+    
+
+    $('.dropdown-toggle').on('show.bs.dropdown', function(){
+        
+    });
+    
+    $('#tab li:first-child button').trigger('click');
+});
+
+</script>
+
+{% endblock %}

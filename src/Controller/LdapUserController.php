@@ -26,22 +26,22 @@ use LdapRecord\Models\Attributes\DistinguishedName;
 use LdapRecord\Utilities;
 use Symfony\Component\HttpClient\HttpClient;
 use LdapRecord\Models\ActiveDirectory\Group;
-use App\Services\HTMLTree;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use PDO;
-use App\Services\AJAXTree;
 use LdapRecord\Auth\BindException;
-use App\Services\TreeItem;
+use App\Services\Ssp;
 use App\Services\LdapCustomFunctions;
 use App\Security\Voter\UserVoter;
 use League\Csv\Reader;
 use utilphp\util;
 use App\Form\LdapUserbulkType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use App\DatatablesBundle\UserDatatable;
+use App\Entity\Utilisateurs;
+use Doctrine\ORM\EntityManagerInterface;
 /**
  * @Route("/ldapadmin", name="ldapadmin_")
  */
@@ -52,8 +52,14 @@ class LdapUserController extends BaseController
      */  
     protected HeaderExtension $headerExt;
     
-    public function __construct( HeaderExtension $headerExt ){
+    /**
+     * @var EntityManagerInterface $em
+     */
+    protected EntityManagerInterface $em;
+    
+    public function __construct( HeaderExtension $headerExt, EntityManagerInterface $em ){
         $this->headerExt = $headerExt;
+        $this->em = $em;
     }
     
     //public
@@ -112,7 +118,7 @@ class LdapUserController extends BaseController
     /**
      * @Route("/usergroupupdate", name="usergroupupdate")
      */
-    public function userGroupUpdate(Request $request): Response
+    public function GroupUpdate(Request $request): Response
     {
         $this->initHtmlHead();
         
@@ -207,11 +213,11 @@ class LdapUserController extends BaseController
     /**
      * @Route("/userbulk", name="userbulk")
      */
-    public function bulkUser(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): Response
+    public function bulk(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): Response
     {
         $this->initHtmlHead();
         $this->headerExt->headScript->appendFile('/js/ldapbulkuser.js');
-        dump($tsl->trans("fileimportVerifyProgress"));
+
         $form = $this->createForm(LdapUserbulkType::class, null, ['help_message'=>$tsl->trans("fileimportVerifyProgress")]);
         
         $form->handleRequest($request);
@@ -348,7 +354,7 @@ class LdapUserController extends BaseController
     /**
      * @Route("/userbulk/verifyfile", name="bulkUserVerifyFile")
      */
-    public function bulkUserVerifyFile(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
+    public function bulkVerifyFile(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
     {
 
         $form = $this->createForm(LdapUserbulkType::class, null);
@@ -392,7 +398,7 @@ class LdapUserController extends BaseController
     /**
      * @Route("/userbulk/progress", name="bulkUserProgress")
      */
-    public function bulkUserProgress(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
+    public function bulkProgress(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
     {
         $response = new JsonResponse();
             
@@ -519,4 +525,38 @@ class LdapUserController extends BaseController
             'title'=>"createUser"
         ]);
     }
+    
+    /**
+     * @Route("/user/list", name="userlist")
+     */
+    public function list(Request $request, UserDatatable $datatable, Ssp $responseService): Response
+    {
+        $this->initHtmlHead();
+        
+        $this->headerExt->headLink->appendStylesheet('https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css');
+        $this->headerExt->headScript->appendFile('//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js');
+        $this->headerExt->headScript->appendFile('https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js');
+        $this->headerExt->headStyle->appendStyle('//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css');
+        
+        $isAjax = $request->isXmlHttpRequest();
+        
+        $ajaxUrl = $this->generateUrl('ldapadmin_userlist');
+        $datatable->buildDatatable(['ajaxUrl'=>$ajaxUrl]);
+        
+        if ($isAjax) {
+            
+            $responseService->setQb($this->em->getRepository(Utilisateurs::class)->findAllForDatatable());
+            
+            $responseService->setDatatable($datatable);
+            return $responseService->getResponse();
+        }    
+        
+        return $this->render('ldap/admin/userlist.html.twig', [
+            
+            "activeMenu" =>"user_list",
+            'title'=>"AllUser",
+            'datatable'=>$datatable
+        ]);
+    }
+    
 }

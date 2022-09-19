@@ -3,10 +3,10 @@
         <li class="nav-item"> Utilisateurs
             <ul class="nav d-block">
                 <li class="nav-item">
-                    <a class="text-white nav-link {% if activeMenu == "user_list" %}active{% endif %}" href="">Utilisateurs actifs</a>
+                    <a class="text-white nav-link {% if activeMenu == "user_list" %}active{% endif %}" href="{{ path('ldapadmin_userlist') }}">Utilisateurs actifs</a>
                 </li>
                 <li class="nav-item">
-                    <a class="text-white nav-link {% if activeMenu == "user_create" %}active{% endif %}" href="{{ path('ldapadmin_usercreate') }}">Créer un utilisateur</a>
+                    <a class="text-white nav-link {% if activeMenu == "user_create" %}active{% endif %}" href="{{ path('ldapadmin_usercreate') }}">{{ "createUser" |trans }}</a>
                 </li>
             </ul>
         </li>

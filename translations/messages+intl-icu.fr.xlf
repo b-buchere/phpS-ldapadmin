@@ -406,6 +406,14 @@
         <source>dlReport</source>
         <target state="translated">Télécharger le rapport</target>
       </trans-unit>
+      <trans-unit id="QggSnn5" resname="userCreate">
+        <source>userCreate</source>
+        <target state="needs-translation"/>
+      </trans-unit>
+      <trans-unit id="vf2RxTR" resname="AllUser">
+        <source>AllUser</source>
+        <target state="translated">Utilisateurs actifs</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>
