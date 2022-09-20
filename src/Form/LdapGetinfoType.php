@@ -46,10 +46,8 @@ class LdapGetinfoType extends AbstractType implements FormTypeInterface
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'csrf_protection' => true,
+            'csrf_protection' => false,
             // the name of the hidden HTML field that stores the token
-            'csrf_field_name' => 'csrf_token',
-            'csrf_token_id'   => 'ldapgetinfo',
             'attr'=>['class'=>'row g-3'],
         ]);
     }

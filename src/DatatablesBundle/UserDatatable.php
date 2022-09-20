@@ -59,7 +59,7 @@ class UserDatatable extends BaseDatatable
         $this->features->setAutoWidth(false);
 
         $this->options->set(array(
-            'classes' => 'table table-bordered table-hover dataTable dtr-inline',
+            'classes' => 'table table-borderless table-striped table-hover dataTable dtr-inline',
             'individual_filtering' => true,
             'individual_filtering_position' => 'head',
             'order' => array(array(0, 'asc')),

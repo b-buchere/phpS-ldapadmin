@@ -478,12 +478,13 @@ class LdapUserController extends BaseController
                         ->in($dn)
                         ->rawFilter('(objectCategory=organizationalUnit)')
                         ->listing()->get();
+        dump($nodeList);
     
         $aRegion = [''=>''];
         foreach($nodeList as $node){
             $aRegion[$node['ou'][0]] = $node['dn'];
         }
-        
+        dump($aRegion);
         $form = $this->createForm(LdapUserCreateType::class, null, [
             'regions'=>$aRegion,
             'ldap_connection'=>$connection

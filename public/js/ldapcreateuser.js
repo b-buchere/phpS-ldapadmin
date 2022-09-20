@@ -2,7 +2,6 @@
 
 $(document).ready(function() {
 
-    var sanitizer = new Sanitizer();
     $('#ldap_user_create_lastname').on('change', function(e){
         $('#ldap_user_create_fullname').val($('#ldap_user_create_firstname').val()+' '+$(this).val());
     });

@@ -60,3 +60,7 @@
 .progress{
   height:20px
 }
+
+#body{
+  height: calc(100vh - 63px);
+}

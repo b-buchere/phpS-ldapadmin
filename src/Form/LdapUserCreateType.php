@@ -128,7 +128,7 @@ class LdapUserCreateType extends AbstractType
                 'region',
                 ChoiceType::class,
                 [
-                    'choices'=>[],
+                    'choices'=>$options['regions'],
                     'label'=>"region",
                     "required"=>true,
                     'attr'=>[
@@ -162,4 +162,5 @@ class LdapUserCreateType extends AbstractType
 
         ]);
     }
+
 }

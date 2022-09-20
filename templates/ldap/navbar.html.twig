@@ -1,0 +1,46 @@
+{% extends 'ldap/admin/ldapadmin.base.html.twig' %}  
+
+{% block title %}
+UNML Search
+{% endblock %}
+
+
+
+{% block body %}
+<div class="row pt-6 mt-6">
+    <div class="col-2"></div>
+    <div class="col-8">
+        {% if results is not empty %}
+        <table class="table table-borderless table-striped">
+            <thead
+                <tr>
+                    <td>Utilisateur</td>
+                    <td>Groupe</td>
+                    <td>UID</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for key,result in results %}
+                    <tr>
+                        <td>{{ result.name }}</td>
+                        <td> {{ result.group }}</td>
+                        <td>{{ result.UID }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+    </div>
+    <div class="col-2"></div>
+</div>
+
+<script>
+$(document).ready(function () {
+    $('.table').DataTable({
+        language: {
+            url: 'https://cdn.datatables.net/plug-ins/1.11.5/i18n/fr-FR.json',
+        },
+    });
+});
+</script>
+{% endblock %}

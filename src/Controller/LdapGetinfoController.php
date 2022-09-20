@@ -139,4 +139,107 @@ class LdapGetinfoController extends BaseController
         ]);
 
     }
+    
+    /**
+     * @Route("/getinfo", name="navbar")
+     */
+    public function navbar(Request $request): Response
+    {
+        $this->initHtmlHead();
+        
+        $this->headerExt->headLink->appendStylesheet("/css/sidebar.css");
+        $this->headerExt->headLink->appendStylesheet("/css/all.min.css");
+        $this->headerExt->headLink->appendStylesheet("/css/custom.css");
+        
+        $this->headerExt->headScript->appendFile("/bundles/datatables/datatables.min.js");
+        $this->headerExt->headLink->appendStylesheet("/bundles/datatables/datatables.min.css");
+        
+        $form = $this->createForm(LdapGetinfoType::class, null);
+        
+        $form->handleRequest($request);
+        
+        $aParsedResult = [];
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            $user = $data['User'];
+            
+            $server = $this->getParameter('ldap_server');
+            $dn = $this->getParameter('ad_base_dn');
+            $user_admin = $this->getParameter('ad_passwordchanger_user');
+            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+            
+            // Create a new connection:
+            $connection = new Connection([
+                'hosts' => [$server],
+                'port' => 389,
+                'base_dn' => $dn,
+                'username' => $user_admin,
+                'password' => $user_pwd,
+            ]);
+            
+            // Add the connection into the container:
+            Container::addConnection($connection);
+            // connexion � un compte pour la lecture de l'annuaire
+            
+            $query = $connection->query();
+            
+            $resultsGroup = $query->select()->rawFilter("(&(objectCategory=group)(cn=*$user*))")->get();
+            $query->clearFilters();
+            $resultsUser  = $query->select()->rawFilter("(&(objectCategory=user)(|(samaccountname=$user)(objectguid=$user)(cn=$user)))")->get();
+            
+            $aParsedResult = [];
+            
+            //Parsage resultat catégorie utilisateur
+            dump($resultsUser);
+            if( !empty($resultsUser) )
+            {
+                
+                foreach($resultsUser as $result){
+                    $user = User::find($result['dn']);
+                    
+                    $aParsedResultTemp = [];
+                    $aParsedResultTemp['name']  = $user->getName();
+                    $aParsedResultTemp['UID']   = $user->getConvertedGuid();
+                    $aParsedResultTemp['group'] = '';
+                    
+                    if(array_key_exists('memberof', $result)){
+                        unset($result['memberof']['count']);
+                        
+                        foreach($result['memberof'] as $group){
+                            
+                            $aParsedResultTemp['group'] .= DistinguishedName::make($group)->name().', ';
+                            
+                        }
+                        $aParsedResultTemp['group'] = substr($aParsedResultTemp['group'], 0, -2);
+                    }
+                    
+
+                    $aParsedResult[] = $aParsedResultTemp;
+                    dump($aParsedResult);
+                }
+                
+            }else{ //Parsage résultat catégorie Groupe
+                
+                foreach($resultsGroup as $result){
+                    $ou = Group::find($result['dn']);
+                    unset($result['member']['count']);
+                    
+                    foreach($result['member'] as $member){
+                        $aParsedResultTemp = [];
+                        $user = User::find($member);
+                        $aParsedResultTemp['name']  = DistinguishedName::make($member)->name();
+                        $aParsedResultTemp['UID']   = $user->getConvertedGuid();
+                        $aParsedResultTemp['group'] = $ou->getName();
+                        $aParsedResult[] = $aParsedResultTemp;
+                    }
+                }
+            }
+        }
+        dump($aParsedResult);
+        return $this->render('ldap/navbar.html.twig', [
+            'activeMenu'=>'',
+            'results'=> $aParsedResult
+        ]);
+        
+    }
 }
