@@ -190,7 +190,6 @@ class LdapGetinfoController extends BaseController
             $aParsedResult = [];
             
             //Parsage resultat catégorie utilisateur
-            dump($resultsUser);
             if( !empty($resultsUser) )
             {
                 
@@ -215,7 +214,6 @@ class LdapGetinfoController extends BaseController
                     
 
                     $aParsedResult[] = $aParsedResultTemp;
-                    dump($aParsedResult);
                 }
                 
             }else{ //Parsage résultat catégorie Groupe
@@ -235,7 +233,7 @@ class LdapGetinfoController extends BaseController
                 }
             }
         }
-        dump($aParsedResult);
+        
         return $this->render('ldap/navbar.html.twig', [
             'activeMenu'=>'',
             'results'=> $aParsedResult

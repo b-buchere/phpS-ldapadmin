@@ -38,6 +38,10 @@ class GroupesRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+    
+    public function findAllForDatatable(){
+        return $this->createQueryBuilder('g');
+    }
 
 //    /**
 //     * @return Groupes[] Returns an array of Groupes objects

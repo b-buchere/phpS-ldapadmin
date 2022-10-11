@@ -5,6 +5,7 @@ namespace App\Controller;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use App\Form\LdapGroupcreateType;
 use App\Form\LdapUserCreateType;
 use App\Form\LdapUserGroupUpdateType;
 use App\Form\PasswordChangeRequestType;
@@ -39,13 +40,15 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use App\DatatablesBundle\GroupDatatable;
 use App\DatatablesBundle\UserDatatable;
 use App\Entity\Utilisateurs;
 use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Groupes;
 /**
- * @Route("/ldapadmin", name="ldapadmin_")
+ * @Route("/ldapadmin/group", name="ldapadmin_group")
  */
-class LdapUserController extends BaseController
+class LdapGroupController extends BaseController
 {
     /**
      * @var HeaderExtension $headerExt
@@ -114,104 +117,9 @@ class LdapUserController extends BaseController
         ]);
 
     }
-
-    /**
-     * @Route("/usergroupupdate", name="usergroupupdate")
-     */
-    public function GroupUpdate(Request $request): Response
-    {
-        $this->initHtmlHead();
-        
-        $form = $this->createForm(LdapUserGroupUpdateType::class, null);
-        
-        $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {
-            $data = $form->getData();
-            /**
-             * @var UploadedFile $file
-             */
-            $file = $data['fileimport'];
-            $file->move('../uploads', 'usergroup.csv');
-            
-            $server = $this->getParameter('ldap_server');
-            $dn = $this->getParameter('ad_base_dn');
-            $user_admin = $this->getParameter('ad_passwordchanger_user');
-            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-            
-            // Create a new connection:
-            $connection = new Connection([
-                'hosts' => [$server],
-                'port' => 389,
-                'base_dn' => $dn,
-                'username' => $user_admin,
-                'password' => $user_pwd,
-                'use_tls'  => true
-            ]);
-            
-            $connection->connect();
-            
-            Container::addConnection($connection);
-            
-            $csv = Reader::createFromPath('../uploads/usergroup.csv', 'r');
-            $csv->setDelimiter(";");
-            $csv->setHeaderOffset(0); //set the CSV header offset
-            
-            $records = $csv->getRecords();
-            $utilphp = new util();
-            $noUser = [];
-            $error = false;
-            foreach ($records as $record) {
-                
-                $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
-                $group = Group::find('cn='.$record['Groupe'].',ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
-                
-                if(!is_null($user)){                    
-                    try {
-                        if(is_null($group)){
-                            $group = (new Group)->inside('ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
-                            $group->cn = $record['Groupe'];
-                            $group->save();
-                        }
-                        if ($user->groups()->attach($group)) {
-                            // Successfully added the group to the user.
-                        }
-                        
-                        $user->save();
-                    } catch (\LdapRecord\LdapRecordException $e) {
-                        // Failed saving user.
-                    }
-                }else{
-                    $error =true;
-                    $noUser[] = $record['Prenom'].' '.$record['Nom'];                    
-                }
-            }
-            
-            if(!empty($noUser)){
-                $this->addFlash('danger', "Le ou les utilisateur.s suivant.s n'existe.nt pas : <br/>". implode('<br/>',$noUser));
-                
-            }
-            unlink('../uploads/usergroup.csv');
-            
-            $this->addFlash('info', "Les utilisateurs ont été mis à jour");
-            if(!$error){
-                return new Response(
-                    ["type"=>"success"],
-                    Response::HTTP_OK,
-                    ['content-type' => 'text/html']
-                );
-            }
-        }
-        
-        return $this->render('ldap/admin/userbulk.html.twig', [
-            'form'=>$form->createView(),
-            'activeMenu'=>"user_group_update",
-            'title'=>"userGroupImport"
-        ]);
-    }
     
     /**
-     * @Route("/userbulk", name="userbulk")
+     * @Route("/group/bulk", name="bulk")
      */
     public function bulk(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): Response
     {
@@ -352,7 +260,7 @@ class LdapUserController extends BaseController
     }
 
     /**
-     * @Route("/userbulk/verifyfile", name="bulkUserVerifyFile")
+     * @Route("/bulk/verifyfile", name="bulkVerifyFile")
      */
     public function bulkVerifyFile(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
     {
@@ -362,13 +270,13 @@ class LdapUserController extends BaseController
         $form->handleRequest($request);
         $response = new JsonResponse();
         if ($form->isSubmitted() && $form->isValid()) {
-            $logger->info($tsl->trans("bulkUserVerifyFile"));
+            $logger->info($tsl->trans("bulkVerifyFile"));
             $data = $form->getData();
             /**
              * @var UploadedFile $file
              */
             $file = $data['fileimport'];
-            $file->move('../uploads', 'user.csv');
+            $file->move('../uploads', 'group.csv');
 
             $csv = Reader::createFromPath('../uploads/user.csv', 'r');
             $csv->setDelimiter(";");
@@ -394,7 +302,7 @@ class LdapUserController extends BaseController
     }
     
     /**
-     * @Route("/userbulk/progress", name="bulkUserProgress")
+     * @Route("/progress", name="bulkProgress")
      */
     public function bulkProgress(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
     {
@@ -420,9 +328,9 @@ class LdapUserController extends BaseController
     }
     
     /**
-     * @Route("/userbulk/report", name="bulkUser_report")
+     * @Route("/bulk/report", name="bulk_report")
      */
-    public function bulkUserReport(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): BinaryFileResponse
+    public function bulkReport(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): BinaryFileResponse
     {
         $session = $request->getSession();
         
@@ -445,99 +353,59 @@ class LdapUserController extends BaseController
     }
     
     /**
-     * @Route("/usercreate", name="usercreate")
+     * @Route("/create", name="create")
      */
     public function create(Request $request): Response
     {
         $this->initHtmlHead();        
-        $this->headerExt->headScript->appendFile('/js/ldapcreateuser.js');
-        
-        $server = $this->getParameter('ldap_server');
-        $dn = $this->getParameter('ad_base_dn');
-        $user_admin = $this->getParameter('ad_passwordchanger_user');
-        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-        
-        // Create a new connection:
-        $connection = new Connection([
-            'hosts' => [$server],
-            'port' => 389,
-            'base_dn' => $dn,
-            'username' => $user_admin,
-            'password' => $user_pwd,
-            'use_tls'  => true
-        ]);        
-        
-        $connection->connect();
-        
-        Container::addConnection($connection);
-        
-        $query = $connection->query();
-        $nodeList = $query->select(['dn','ou','namingContexts'])
-                        ->in($dn)
-                        ->rawFilter('(objectCategory=organizationalUnit)')
-                        ->listing()->get();
-    
-        $aRegion = [''=>''];
-        foreach($nodeList as $node){
-            $aRegion[$node['ou'][0]] = $node['dn'];
-        }
-        
-        $form = $this->createForm(LdapUserCreateType::class, null, [
-            'regions'=>$aRegion,
-            'ldap_connection'=>$connection
-        ]);
+        //$this->headerExt->headScript->appendFile('/js/ldapcreategroup.js');
 
+        $form = $this->createForm(LdapGroupcreateType::class, null);
+        
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-
-            $utilphp = new util();
-
-            $user = User::findBy('samaccountname', strtolower($form->get('firstname')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('lastname')->getData())));
-
-            if(is_null($user)){
-                $user = (new User)->inside($form->get('structure')->getData());
-                $user->cn = $form->get('firstname')->getData().' '.$form->get('lastname')->getData();
-                $user->unicodePwd = '';
-                $user->samaccountname = strtolower($form->get('firstname')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('lastname')->getData()));
-                $user->mail = $form->get('mail')->getData();
-                $user->userAccountControl = 512;
-                $user->pwdlastset = 0;
-                
-                try {
-                    $user->save();
-                    
-                    $userDb = new Utilisateurs();
-                    $userDb->setDn($user->getDn());
-                    $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
-                    $userDb->setNom($user->getConnectionName());
-                    $userDb->setCourriel($user->getAttribute('mail'));
-                    
-                    $this->em->persist($userDb);
-                    $this->em->flush();
-                    
-                    $this->addFlash("success", "userCreated");
-                } catch (\LdapRecord\LdapRecordException $e) {
-                    // Failed saving user.
-                }
-            }else{
-                $this->addFlash("error", "userAlreadyExists");
-            }
-
+            
+            $server = $this->getParameter('ldap_server');
+            $dn = $this->getParameter('ad_base_dn');
+            $user_admin = $this->getParameter('ad_passwordchanger_user');
+            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+            
+            // Create a new connection:
+            $connection = new Connection([
+                'hosts' => [$server],
+                'port' => 389,
+                'base_dn' => $dn,
+                'username' => $user_admin,
+                'password' => $user_pwd,
+            ]);
+            
+            // Add the connection into the container:
+            Container::addConnection($connection);
+            // connexion � un compte pour la lecture de l'annuaire
+            
+            
+            $transverseDn = "OU=Groups,OU=TRANSVERSE,DC=ncunml,DC=ass";
+            /**
+             * @var OrganizationalUnit $ou
+             */
+            
+            $group = (new Group)->inside($transverseDn);
+            $group->cn = 'GT_'.strtoupper( $data["groupName"] );
+            $group->save();
         }
-        
-        return $this->render('ldap/admin/usercreate.html.twig', [
+        return $this->render('ldap/admin/groupcreate.html.twig', [
             'form'=>$form->createView(),
-            "activeMenu" =>"user_create",
-            'title'=>"createUser"
+            "activeMenu"=>"group_create",
+            'title'=>"groupCreate"
         ]);
     }
     
     /**
-     * @Route("/user/list", name="userlist")
+     * @Route("/list", name="list")
      */
-    public function list(Request $request, UserDatatable $datatable, Ssp $responseService): Response
+    public function list(Request $request, GroupDatatable $datatable, Ssp $responseService): Response
     {
         $this->initHtmlHead();
         
@@ -548,21 +416,21 @@ class LdapUserController extends BaseController
         
         $isAjax = $request->isXmlHttpRequest();
         
-        $ajaxUrl = $this->generateUrl('ldapadmin_userlist');
+        $ajaxUrl = $this->generateUrl('ldapadmin_grouplist');
         $datatable->buildDatatable(['ajaxUrl'=>$ajaxUrl]);
         
         if ($isAjax) {
             
-            $responseService->setQb($this->em->getRepository(Utilisateurs::class)->findAllForDatatable());
+            $responseService->setQb($this->em->getRepository(Groupes::class)->findAllForDatatable());
             
             $responseService->setDatatable($datatable);
             return $responseService->getResponse();
         }    
         
-        return $this->render('ldap/admin/userlist.html.twig', [
+        return $this->render('ldap/admin/grouplist.html.twig', [
             
-            "activeMenu" =>"user_list",
-            'title'=>"AllUser",
+            "activeMenu" =>"group_list",
+            'title'=>"AllGroup",
             'datatable'=>$datatable
         ]);
     }

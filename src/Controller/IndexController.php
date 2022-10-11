@@ -38,7 +38,7 @@ class IndexController extends BaseController
     }
  
     /**
-     * @Route("/", name="index", host="search.unml.info", condition="not (context.getHost() matches '/search\.unml\.info/')")
+     * @Route("/", name="index", condition="not (context.getHost() matches '/search\.unml\.info/')")
      */
     public function index(): Response
     {      

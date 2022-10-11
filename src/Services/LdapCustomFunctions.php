@@ -146,7 +146,6 @@ class LdapCustomFunctions
         $exists = false;
         
         foreach ($oUserGroups as $group){
-            dump($group->getDn());
             $exists = stripos($group->getDn(), $dn ) !== false;
             if($exists){
                 break;
@@ -199,10 +198,7 @@ class LdapCustomFunctions
              * @var OrganizationalUnit $node 
              */
 
-        //if($nodelist){
-        /*    dump($tree);
-        dump($node->getDn());*/
-            //dump($dn);
+
             /**
              * @var TreeItem $entry
              */
@@ -211,7 +207,7 @@ class LdapCustomFunctions
             $ldapOuSanitized = util::sanitize_string($ou->getName());
             $entry->setSanitizedName($ldapOuSanitized);
             $entry->setDisplayName($ou->getName());
-            //dump($ou->getName());
+            
             $childCount = count($descendantsOu) + count($users) + count($groups);
             if($childCount){
                 
@@ -272,7 +268,6 @@ class LdapCustomFunctions
         $userGroups = $user->groups();
         $oUserGroups = $userGroups->get();
         
-        dump($nodelist);
         foreach($nodelist as $node){
             
             if($node instanceof Entry){

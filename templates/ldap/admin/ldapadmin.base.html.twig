@@ -18,25 +18,30 @@
         <div class="vh-100 m-0">
             <header class="p-3 bg-dark text-white">
                 <div class="container">
-                  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
-                    <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
-                      <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
-                      Centre d'administration
-                    </a>
-
-                    <form name="ldap_getinfo" method="post" action="{{ path('ldapgetinfo_navbar') }}">
-                        <div id="ldap_getinfo" class="row g-3">
-                            <div class="">
-                                <input type="text" id="ldap_getinfo_User" name="ldap_getinfo[User]" required="required" placeholder="Utilisateur" class="form-control">
+                  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start row">
+                    <div class="col-4">
+                        <a href="#" class="d-flex align-items-center me-lg-auto mb-2 mb-lg-0 text-white text-decoration-none fs-4">
+                          <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
+                          Centre d'administration
+                        </a>
+                    </div>
+                    <div class="col-4">
+                        <form name="ldap_getinfo" method="post" action="{{ path('ldapgetinfo_navbar') }}">
+                            <div id="ldap_getinfo" class="row g-3">
+                                <div class="">
+                                    <input type="text" id="ldap_getinfo_User" name="ldap_getinfo[User]" required="required" placeholder="Utilisateur" class="form-control">
+                                </div>
+                                <div class="d-none">
+                                    <button type="submit" id="ldap_getinfo_search" name="ldap_getinfo[search]" class="btn btn-primary mb-3 col-12">Rechercher</button>
+                                </div>
                             </div>
-                            <div class="d-none">
-                                <button type="submit" id="ldap_getinfo_search" name="ldap_getinfo[search]" class="btn btn-primary mb-3 col-12">Rechercher</button>
-                            </div>
+                        </form>
+                    </div>
+                    <div class="col-4">
+                        <div class="text-end">
+                            <span>{{ app.user.entry.cn[0] }}</span>
+                            <a href="{{ path('logout') }}" class="text-white"><i class="fa-solid fa-power-off fa-2xl"></i></a>
                         </div>
-                    </form>
-            
-                    <div class="text-end">
-
                     </div>
                   </div>
                 </div>

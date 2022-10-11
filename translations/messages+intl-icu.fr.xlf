@@ -414,6 +414,18 @@
         <source>AllUser</source>
         <target state="translated">Utilisateurs actifs</target>
       </trans-unit>
+      <trans-unit id="6oTcHzC" resname="bulkVerifyFile">
+        <source>bulkVerifyFile</source>
+        <target>__bulkVerifyFile</target>
+      </trans-unit>
+      <trans-unit id="GaoxIRn" resname="createGroup">
+        <source>createGroup</source>
+        <target state="translated">Créer un groupe</target>
+      </trans-unit>
+      <trans-unit id="OD03koY" resname="AllGroup">
+        <source>AllGroup</source>
+        <target state="translated">Liste des groupes</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

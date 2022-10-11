@@ -31,7 +31,6 @@ class LdapUserbulkType extends AbstractType
                     'help'=>'<span class="spinner-border spinner-border-sm" role="status"></span> <span>'.$options['help_message'].'</span>',
                     'help_attr'=>['class'=>"m-0 mb-1 invisible"],
                     "help_html"=>true,
-                    'translation_domain'=>false,
                     'constraints' => [
                         new File([
                             'mimeTypes' => [

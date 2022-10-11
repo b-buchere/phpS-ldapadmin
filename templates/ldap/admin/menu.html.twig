@@ -15,10 +15,10 @@
             Groupe
             <ul class="nav d-block">
                 <li>
-                    <a class="text-white nav-link" href="">Liste des groupes</a>
+                    <a class="text-white nav-link {% if activeMenu == "group_list" %}active{% endif %}" href="{{ path('ldapadmin_grouplist') }}">{{ "AllGroup" |trans }}</a>
                 </li>
                 <li>
-                    <a class="text-white nav-link {% if activeMenu == "group_create" %}active{% endif %}" href="{{ path('ldapadmin_groupcreate') }}">Créer un groupe</a>
+                    <a class="text-white nav-link {% if activeMenu == "group_create" %}active{% endif %}" href="{{ path('ldapadmin_groupcreate') }}">{{ "createGroup" |trans }}</a>
                 </li>
             </ul>
         </li>

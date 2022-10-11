@@ -19,7 +19,7 @@ class LdapUserGroupUpdateType extends AbstractType
                 'fileimport',
                 FileType::class,
                 [
-                    'label'=>"Fichier à importer",
+                    'label'=>"fileimport",
                     'attr'=>[
                         'placeholder'=>'file',
                         'class'=>'form-control',
@@ -27,9 +27,13 @@ class LdapUserGroupUpdateType extends AbstractType
                     'row_attr'=>[
                         'class'=>""
                     ],
+                    'help'=>'<span class="spinner-border spinner-border-sm" role="status"></span> <span>'.$options['help_message'].'</span>',
+                    'help_attr'=>['class'=>"m-0 mb-1 invisible"],
+                    "help_html"=>true,
                     'constraints' => [
                         new File([
                             'mimeTypes' => [
+                                'text/plain',
                                 'text/csv'
                             ],
                             'mimeTypesMessage' => 'Veuillez choisir un document csv',
@@ -40,6 +44,7 @@ class LdapUserGroupUpdateType extends AbstractType
                     'valid',
                     SubmitType::class,
                     [
+                        'label'=>'import',
                         'row_attr'=>[
                             'class'=>""
                         ],
@@ -53,8 +58,8 @@ class LdapUserGroupUpdateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
-            'csrf_field_name' => '_csrf_token'
-
+            'csrf_field_name' => '_csrf_token',
+            'help_message'=>""
         ]);
     }
 }

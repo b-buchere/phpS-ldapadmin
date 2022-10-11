@@ -103,10 +103,10 @@ class LdapAdminController extends BaseController
         
         $query = $connection->query();
         $resultsNode = $query->select()->rawFilter("(objectCategory=organizationalUnit)")->get();
-
         
         return $this->render('ldap/admin/index.html.twig', [
-            'user' => $this->getUser()
+            'user' => $this->getUser(),
+            'activeMenu'=>''
         ]);
 
     }
@@ -206,55 +206,6 @@ class LdapAdminController extends BaseController
             'baseTree'=>$requestedDn,
             'tree'=>$dnTree,
             'user' => $this->getUser()
-        ]);
-    }
-    
-    /**
-     * @Route("/groupcreate", name="groupcreate")
-     */
-    public function groupCreate(Request $request): Response
-    {       
-        $this->initHtmlHead();
-        
-        $form = $this->createForm(LdapGroupcreateType::class, null);
-        
-        $form->handleRequest($request);
-        
-        if ($form->isSubmitted() && $form->isValid()) {    
-            $data = $form->getData();
-            
-            $server = $this->getParameter('ldap_server');
-            $dn = $this->getParameter('ad_base_dn');
-            $user_admin = $this->getParameter('ad_passwordchanger_user');
-            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-            
-            // Create a new connection:
-            $connection = new Connection([
-                'hosts' => [$server],
-                'port' => 389,
-                'base_dn' => $dn,
-                'username' => $user_admin,
-                'password' => $user_pwd,
-            ]);
-            
-            // Add the connection into the container:
-            Container::addConnection($connection);
-            // connexion � un compte pour la lecture de l'annuaire
-            
-            
-            $transverseDn = "OU=Groups,OU=TRANSVERSE,DC=ncunml,DC=ass";
-            /**
-             * @var OrganizationalUnit $ou
-             */
-            
-            $group = (new Group)->inside($transverseDn);
-            $group->cn = 'GT_'.strtoupper( $data["groupName"] );            
-            $group->save();
-        }
-        return $this->render('ldap/admin/groupcreate.html.twig', [
-            'form'=>$form->createView(),
-            "activeMenu"=>"group_create",
-            'title'=>"groupCreate"
         ]);
     }
     
