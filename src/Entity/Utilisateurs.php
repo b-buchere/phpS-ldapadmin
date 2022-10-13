@@ -27,6 +27,11 @@ class Utilisateurs
     /**
      * @ORM\Column(type="string", length=255)
      */
+    private $prenom;
+    
+    /**
+     * @ORM\Column(type="string", length=255)
+     */
     private $identifiant;
 
     /**
@@ -40,10 +45,16 @@ class Utilisateurs
     private $dn;
 
     /**
+     * @ORM\Column(type="boolean", options={"default":"0"})
+     */
+    private $hidden;
+    
+    /**
      * @ORM\ManyToMany(targetEntity=Groupes::class, mappedBy="membres")
      */
     private $groupes;
 
+    
     public function __construct()
     {
         $this->groupes = new ArrayCollection();
@@ -66,6 +77,18 @@ class Utilisateurs
         return $this;
     }
 
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+    
+    public function setPrenom(string $prenom): self
+    {
+        $this->prenom = $prenom;
+        
+        return $this;
+    }
+    
     public function getIdentifiant(): ?string
     {
         return $this->identifiant;
@@ -128,4 +151,20 @@ class Utilisateurs
 
         return $this;
     }
+    /**
+     * @return mixed
+     */
+    public function isHidden()
+    {
+        return $this->hidden;
+    }
+
+    /**
+     * @param mixed $hidden
+     */
+    public function setHidden($hidden)
+    {
+        $this->hidden = $hidden;
+    }
+
 }

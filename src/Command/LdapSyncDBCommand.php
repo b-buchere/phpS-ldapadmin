@@ -68,9 +68,26 @@ class LdapSyncDBCommand extends Command
             $em = $this->container->get('doctrine')->getManager();
             
             $user = new Utilisateurs();
-            $user->setNom($ldapUser->getName());
+            $user->setNom('');
+            $user->setPrenom('');
+            if(!is_null($ldapUser->getAttribute('sn'))){
+                $user->setNom($ldapUser->getAttribute('sn')[0]);
+            }
+            
+            if(!is_null($ldapUser->getAttribute('givenname'))){
+                $user->setPrenom($ldapUser->getAttribute('givenname')[0]);
+            }
+            
             $user->setDn($ldapUser->getDn());
             $user->setIdentifiant($ldapUser->getAttribute('samaccountname')[0]);
+            
+            $user->setHidden(false);
+            
+            $group = Group::find('CN=Administrators,CN=Builtin,DC=ncunml,DC=ass');
+            
+            if( $ldapUser->groups()->exists($group) ){
+                $user->setHidden(true);
+            }
             
             if(!is_null($ldapUser->getAttribute('mail'))){
                 $user->setCourriel($ldapUser->getAttribute('mail')[0]);
@@ -85,7 +102,7 @@ class LdapSyncDBCommand extends Command
                         
                         $groupeDb = new Groupes();
                         $groupeDb->setDn($groupeLdap->getDn());
-                        $groupeDb->setNom($groupeLdap->getName());                    
+                        $groupeDb->setNom($groupeLdap->getName());
                             
                     }
                     $em->persist($groupeDb);

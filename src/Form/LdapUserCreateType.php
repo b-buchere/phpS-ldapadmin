@@ -7,12 +7,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use App\Entity\Utilisateurs;
 
 class LdapUserCreateType extends AbstractType
 {
@@ -54,15 +56,79 @@ class LdapUserCreateType extends AbstractType
                 ]
             );
         });
+        
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            $data = $event->getData();
+            $form = $event->getForm();
+            
+            //Eclatement du dn pour parser le dn uniquement avec l'OU de région et de structure de l'utilisateur
+            $userDnExploded = explode(',',$data->getDn());
+            
+            array_shift($userDnExploded);
+            $userDnStructure = implode(",", $userDnExploded);
+            
+            array_shift($userDnExploded);
+            $userDnRegion = implode(",", $userDnExploded);
 
-        $builder->add(
-                'lastname',
-                TextType::class,
+            $connection = $form->getConfig()->getOption('ldap_connection');
+            $query = $connection->query();
+            $nodeList = $query->select(['dn','ou','namingContexts'])
+            ->in($userDnRegion)
+            ->rawFilter('(objectCategory=organizationalUnit)')
+            ->listing()->get();
+            
+            $aStructure = [''=>''];
+            foreach($nodeList as $node){
+                $aStructure[$node['ou'][0]] = $node['dn'];
+            }
+            
+            $form->remove('structure');
+            $form->add(
+                'structure',
+                ChoiceType::class,
                 [
-                    'label'=>"lastname",
+                    'data'=>$userDnStructure,
+                    'mapped'=>false,
+                    'choices'=>$aStructure,
+                    'label'=>"structure",
                     "required"=>true,
                     'attr'=>[
-                        'placeholder'=>'lastname',
+                        "placeholder"=>"structure",
+                        'class'=>'form-select'
+                    ],
+                    'row_attr'=>[
+                        'class'=>"col-6"
+                    ],
+                ]
+                );
+        });
+
+        $builder->addEventListener(FormEvents::POST_SET_DATA, function (FormEvent $event) {
+            $data = $event->getData();
+            $form = $event->getForm();
+            
+            //Eclatement du dn pour parser le dn uniquement avec l'OU de région et de structure de l'utilisateur
+            $userDnExploded = explode(',',$data->getDn());
+            
+            array_shift($userDnExploded);
+            
+            array_shift($userDnExploded);
+            $userDnRegion = implode(",", $userDnExploded);
+            dump($data);
+            
+            $form->get('fullname')->setData($data->getPrenom().' '.$data->getNom());
+            $form->get('region')->setData($userDnRegion);
+            
+        });
+        
+        $builder->add(
+                'nom',
+                TextType::class,
+                [
+                    'label'=>"nom",
+                    "required"=>true,
+                    'attr'=>[
+                        'placeholder'=>'nom',
                         'class'=>'form-control',
                     ],
                     'row_attr'=>[
@@ -70,13 +136,13 @@ class LdapUserCreateType extends AbstractType
                     ],
                 ]
             )->add(
-                'firstname',
+                'prenom',
                 TextType::class,
                 [
-                    'label'=>"firstname",
+                    'label'=>"prenom",
                     "required"=>true,
                     'attr'=>[
-                        'placeholder'=>'firstname',
+                        'placeholder'=>'prenom',
                         'class'=>'form-control',
                     ],
                     'row_attr'=>[
@@ -87,6 +153,7 @@ class LdapUserCreateType extends AbstractType
                 'fullname',
                 TextType::class,
                 [
+                    'mapped'=>false,
                     'label'=>"fullname",
                     'attr'=>[
                         'class'=>'form-control',
@@ -97,12 +164,12 @@ class LdapUserCreateType extends AbstractType
                     ],
                 ]
             )->add(
-                'mail',
+                'courriel',
                 TextType::class,
                 [
-                    'label'=>"mail",
+                    'label'=>"courriel",
                     'attr'=>[
-                        "placeholder"=>"mail",
+                        "placeholder"=>"courriel",
                         'class'=>'form-control'
                     ],
                     'row_attr'=>[
@@ -113,6 +180,7 @@ class LdapUserCreateType extends AbstractType
                 'structure',
                 ChoiceType::class,
                 [
+                    'mapped'=>false,
                     'choices'=>array(),
                     'label'=>"structure",
                     "required"=>true,
@@ -128,6 +196,7 @@ class LdapUserCreateType extends AbstractType
                 'region',
                 ChoiceType::class,
                 [
+                    'mapped'=>false,
                     'choices'=>$options['regions'],
                     'label'=>"region",
                     "required"=>true,
@@ -144,10 +213,22 @@ class LdapUserCreateType extends AbstractType
                 SubmitType::class,
                 [
                     'row_attr'=>[
-                        'class'=>""
+                        'class'=>"col-3"
                     ],
                     'attr'=>[
-                        "class"=>"btn btn-primary mb-3 col-12"
+                        "class"=>"btn btn-outline-dark mb-3 col-12"
+                    ]
+                ]
+            )
+            ->add(
+                'cancel',
+                ButtonType::class,
+                [
+                    'row_attr'=>[
+                        'class'=>"col-3"
+                    ],
+                    'attr'=>[
+                        "class"=>"btn btn-outline-dark mb-3 col-12"
                     ]
                 ]
             );
@@ -156,9 +237,11 @@ class LdapUserCreateType extends AbstractType
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
+            'data_class'=>Utilisateurs::class,
             'csrf_field_name' => '_csrf_token',
             'regions'=>array(),
-            'ldap_connection'=>null
+            'ldap_connection'=>null,
+            'attr'=>["class"=>"container p-2"]
 
         ]);
     }

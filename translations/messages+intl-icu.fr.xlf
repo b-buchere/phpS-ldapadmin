@@ -242,15 +242,15 @@
         <note priority="1">sambaldap\src\Form\LdapUserCreateType.php:120</note>
         <note priority="1">obsolete</note>
       </trans-unit>
-      <trans-unit id="VbXFH4Z" resname="lastname">
-        <source>lastname</source>
+      <trans-unit id="L1iK.hS" resname="nom">
+        <source>nom</source>
         <target>Nom</target>
         <note priority="1">sambaldap\src\Form\LdapUserCreateType.php:62</note>
         <note priority="1">sambaldap\src\Form\LdapUserCreateType.php:66</note>
         <note priority="1">obsolete</note>
       </trans-unit>
-      <trans-unit id="TP3eab3" resname="firstname">
-        <source>firstname</source>
+      <trans-unit id="KcFzACF" resname="prenom">
+        <source>prenom</source>
         <target>Prénom</target>
         <note priority="1">sambaldap\src\Form\LdapUserCreateType.php:76</note>
         <note priority="1">sambaldap\src\Form\LdapUserCreateType.php:80</note>
@@ -262,8 +262,8 @@
         <note priority="1">sambaldap\src\Form\LdapUserCreateType.php:90</note>
         <note priority="1">obsolete</note>
       </trans-unit>
-      <trans-unit id="ANjT8Rc" resname="mail">
-        <source>mail</source>
+      <trans-unit id="Y9M_0Gd" resname="courriel">
+        <source>courriel</source>
         <target>Courriel</target>
         <note priority="1">sambaldap\src\Form\LdapUserCreateType.php:103</note>
         <note priority="1">sambaldap\src\Form\LdapUserCreateType.php:106</note>
@@ -425,6 +425,18 @@
       <trans-unit id="OD03koY" resname="AllGroup">
         <source>AllGroup</source>
         <target state="translated">Liste des groupes</target>
+      </trans-unit>
+      <trans-unit id="Ofl_gDu" resname="userOrGroupSearch">
+        <source>userOrGroupSearch</source>
+        <target state="translated">Rechercher groupe ou utilisateur</target>
+      </trans-unit>
+      <trans-unit id="1swKCIw" resname="refresh">
+        <source>refresh</source>
+        <target state="translated">actualiser</target>
+      </trans-unit>
+      <trans-unit id="aW42MQT" resname="editUser">
+        <source>editUser</source>
+        <target state="translated">Modifier un utilisateur</target>
       </trans-unit>
     </body>
   </file>

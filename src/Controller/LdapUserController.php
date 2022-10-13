@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\LdapUserCreateType;
 use App\Form\LdapUserGroupUpdateType;
-use App\Form\PasswordChangeRequestType;
 use App\Twig\HeaderExtension;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Mailer\MailerInterface;
@@ -158,11 +157,14 @@ class LdapUserController extends BaseController
             $csv->setHeaderOffset(0); //set the CSV header offset
             
             $records = $csv->getRecords();
+            
             $utilphp = new util();
             $noUser = [];
             $error = false;
             foreach ($records as $record) {
-                
+                /**
+                 * @var User $user
+                 */
                 $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
                 $group = Group::find('cn='.$record['Groupe'].',ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
                 
@@ -173,6 +175,10 @@ class LdapUserController extends BaseController
                             $group->cn = $record['Groupe'];
                             $group->save();
                         }
+                        /**
+                         * @var 
+                         */
+                        $userGroup = $user->groups()->attachMany($models);
                         if ($user->groups()->attach($group)) {
                             // Successfully added the group to the user.
                         }
@@ -482,7 +488,9 @@ class LdapUserController extends BaseController
             $aRegion[$node['ou'][0]] = $node['dn'];
         }
         
-        $form = $this->createForm(LdapUserCreateType::class, null, [
+        $userDb = new Utilisateurs();
+        
+        $form = $this->createForm(LdapUserCreateType::class, $userDb, [
             'regions'=>$aRegion,
             'ldap_connection'=>$connection
         ]);
@@ -494,13 +502,13 @@ class LdapUserController extends BaseController
 
             $utilphp = new util();
 
-            $user = User::findBy('samaccountname', strtolower($form->get('firstname')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('lastname')->getData())));
+            $user = User::findBy('samaccountname', strtolower($form->get('prenom')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('nom')->getData())));
 
             if(is_null($user)){
                 $user = (new User)->inside($form->get('structure')->getData());
-                $user->cn = $form->get('firstname')->getData().' '.$form->get('lastname')->getData();
+                $user->cn = $form->get('prenom')->getData().' '.$form->get('nom')->getData();
                 $user->unicodePwd = '';
-                $user->samaccountname = strtolower($form->get('firstname')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('lastname')->getData()));
+                $user->samaccountname = strtolower($form->get('prenom')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('nom')->getData()));
                 $user->mail = $form->get('mail')->getData();
                 $user->userAccountControl = 512;
                 $user->pwdlastset = 0;
@@ -508,7 +516,6 @@ class LdapUserController extends BaseController
                 try {
                     $user->save();
                     
-                    $userDb = new Utilisateurs();
                     $userDb->setDn($user->getDn());
                     $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
                     $userDb->setNom($user->getConnectionName());
@@ -535,6 +542,92 @@ class LdapUserController extends BaseController
     }
     
     /**
+     * @Route("/useredit/{id}", name="useredit")
+     */
+    public function edit(int $id, Request $request): Response
+    {
+        $this->initHtmlHead();
+        $this->headerExt->headScript->appendFile('/js/ldapcreateuser.js');
+        
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
+        
+        $query = $connection->query();
+        $nodeList = $query->select(['dn','ou','namingContexts'])
+        ->in($dn)
+        ->rawFilter('(objectCategory=organizationalUnit)')
+        ->listing()->get();
+        
+        $aRegion = [''=>''];
+        foreach($nodeList as $node){
+            $aRegion[$node['ou'][0]] = $node['dn'];
+        }
+        
+        /**
+         * @var Utilisateurs $user
+         */
+        $user = $this->em->getRepository(Utilisateurs::class)->findOneById($id);
+        
+        $form = $this->createForm(LdapUserCreateType::class, $user, [
+            'regions'=>$aRegion,
+            'ldap_connection'=>$connection
+        ]);
+
+        
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $utilphp = new util();
+            
+            $user = User::findBy('samaccountname', strtolower($form->get('firstname')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('lastname')->getData())));            
+
+            $user = (new User)->inside($form->get('structure')->getData());
+            //$user->cn = $form->get('firstname')->getData().' '.$form->get('lastname')->getData();
+            $user->mail = $form->get('mail')->getData();
+            //$user->pwdlastset = 0;
+            
+            try {
+                $user->save();
+                
+                $userDb = $this->em->getRepository(Utilisateurs::class);
+                $userDb->setDn($user->getDn());
+                $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
+                $userDb->setNom($user->getConnectionName());
+                $userDb->setCourriel($user->getAttribute('mail'));
+                
+                $this->em->persist($userDb);
+                $this->em->flush();
+                
+                $this->addFlash("success", "userModified");
+            } catch (\LdapRecord\LdapRecordException $e) {
+                // Failed saving user.
+            }
+        }
+        
+        return $this->render('ldap/admin/usercreate.html.twig', [
+            'form'=>$form->createView(),
+            "activeMenu" =>"user_create",
+            'title'=>$user->getPrenom().' '.$user->getNom()
+        ]);
+    }
+    
+    /**
      * @Route("/user/list", name="userlist")
      */
     public function list(Request $request, UserDatatable $datatable, Ssp $responseService): Response
@@ -553,7 +646,7 @@ class LdapUserController extends BaseController
         
         if ($isAjax) {
             
-            $responseService->setQb($this->em->getRepository(Utilisateurs::class)->findAllForDatatable());
+            $responseService->setQb($this->em->getRepository(Utilisateurs::class)->findAllForDatatableUserRight());
             
             $responseService->setDatatable($datatable);
             return $responseService->getResponse();

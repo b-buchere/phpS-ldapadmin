@@ -40,8 +40,9 @@ class UtilisateursRepository extends ServiceEntityRepository
         }
     }
 
-    public function findAllForDatatable(){
-        return $this->createQueryBuilder('u');
+    public function findAllForDatatableUserRight(){
+        return $this->createQueryBuilder('u')
+                    ->andWhere("u.hidden = false");
     }
 
 //    public function findOneBySomeField($value): ?Utilisateurs

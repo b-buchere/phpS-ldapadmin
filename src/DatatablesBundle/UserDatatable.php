@@ -29,6 +29,7 @@ class UserDatatable extends BaseDatatable
             $row['identifiant'] = $user->getIdentifiant();
             $row['courriel'] = $user->getCourriel();
             $row['groupes'] = '';
+            $row['groupes'] = '';
             
             $userGroupes = $user->getGroupes();
             
@@ -93,7 +94,57 @@ class UserDatatable extends BaseDatatable
                 'searchable' => false,
                 'orderable' => true,
                 'title'=>'Groupes',
-            ]);
+                'width'=>'400',
+                'class_name'=>'text-truncate groupe_col'
+            ])
+/*            ->add('enabled', BooleanColumn::class, [
+                'searchable' => true,
+                'title'=>'Actif',
+                'true_icon'=> 'badge badge-pill bg-success',
+                'false_icon' => 'badge rounded-pill bg-danger',
+                'filter' => array(SelectFilter::class, array(
+                    'search_type' => 'eq',
+                    'select_options' => array(
+                        '' => 'Tout',
+                        '1' => 'Oui',
+                        '0' => 'Non'
+                    ),
+                )),
+            ])*/
+            ->add(null, ActionColumn::class, array(
+                'title' => 'Actions',
+                'start_html' => '<div class="btn-group w-100" role="group" aria-label="actions">',
+                'end_html' => '</div>',
+                'actions' => [
+                    [
+                        'route' => 'ldapadmin_useredit',
+                        'label' => '',
+                        'icon'  => 'fas fa-edit',
+                        'route_parameters' => [
+                            'id' => 'id'
+                        ],
+                        'attributes' => [
+                            'rel' => 'tooltip',
+                            'title' => 'Modifier',
+                            'role' => 'button'
+                        ]
+                    ]/*,
+                    [
+                        'route' => 'admin_product_delete',
+                        'label' => '',
+                        'icon'  => 'fas fa-trash',
+                        'route_parameters' => [
+                            'id' => 'id',
+                        ],
+                        'attributes' => [
+                            'rel' => 'tooltip',
+                            'title' => 'Supprimer',
+                            'class' => 'btn btn-danger btn-xs',
+                            'role' => 'button'
+                        ]
+                    ]*/
+                ]
+            ));
             /*->add(null, ActionColumn::class, array(
                 'title' => 'Actions',
                 'start_html' => '<div class="btn-group w-100" role="group" aria-label="actions">',
