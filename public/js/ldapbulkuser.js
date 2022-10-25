@@ -46,6 +46,7 @@ $(document).ready(function() {
                 method: 'POST',
 				processData: false,
 				contentType: false,
+				async:true,
                 data: formData
             }).done(function(asyncContent ){
 				/*try {
@@ -64,6 +65,7 @@ $(document).ready(function() {
             const that = this;
             $.ajax({
                 url: "/ldapadmin/userbulk/progress",
+                async:true,
                 type: "POST"
             }).done(function (data) {
                 console.log(data);

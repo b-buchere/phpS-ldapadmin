@@ -114,7 +114,6 @@ class LdapUserCreateType extends AbstractType
             
             array_shift($userDnExploded);
             $userDnRegion = implode(",", $userDnExploded);
-            dump($data);
             
             $form->get('fullname')->setData($data->getPrenom().' '.$data->getNom());
             $form->get('region')->setData($userDnRegion);

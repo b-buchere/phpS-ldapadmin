@@ -2,7 +2,15 @@
 
 {% block body %}
 
-<h1 class="border-bottom border-dark border-2 py-2">{{ title|trans }}</h1>
+<h1 class="border-bottom border-dark border-2 py-2">{{ title|trans }}
+        {% if form.vars.data.id %}
+            | <a class="text-decoration-none text-body fs-5" href="{{ path('ldapadmin_user_resetpwd', {id: form.vars.data.id}) }}">
+            <span class="bi bi-fa">
+            <i class="fa-solid fa-key"></i></span> {{ 'resetPwd'|trans }}
+            
+            </a>
+        {% endif %}
+</h1>
 {# Affiche tous les messages flash #}
 {% for type, messages in app.flashes %}
     <div class="alert bg-{% if type == "error" %}danger{% else %}{{ type }}{% endif %} {% if type != "info" %}text-white{% endif %}">
@@ -30,16 +38,28 @@
     </div>
     <div id="structure" class="row pt-2 pb-1">
         <h2 class="border-bottom border-dark border-2 px-0 pb-2">Structure</h2>
+
         {{ form_row(form.region) }}
         {{ form_row(form.structure) }}
     </div>
     <p class="callout callout-info p-1 mt-3">{% trans %}usercreate.info{% endtrans %}</p>
-    
     {% if form.vars.data.id %}
     <div class="">
-        <h2>Membre de</h2>
-        <div>
-        
+        <h2>Membre de | 
+        <a class="text-decoration-none text-body fs-5" href="{{ path('ldapadmin_user_groupadd', {id: form.vars.data.id}) }}">
+            <span class="me-3">
+              <span id="add_group" class="fa-stack small">
+                <i class="fa-solid fa-users fa-stack-2x"></i>
+                <i class="fa-solid fa-plus fa-stack-1x"></i>
+              </span>
+              {{ 'groupAdd'|trans }}
+           </span>
+        </a></h2>
+        <div class="border border-dark rounded p-2 w-50 mb-2">
+            {% for groupe in form.vars.data.groupes %}
+                {{ groupe.nom }}{% if not loop.last %}, {% endif %}
+            {% endfor %}
+            
         </div>
     </div>
     {% endif %}

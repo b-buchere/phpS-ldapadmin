@@ -267,6 +267,7 @@ class LdapUserController extends BaseController
             
             $csvHeader =$csv->getHeader();
             $userTotal = $csv->count();
+            
             $userAdded = 0;
             $userError = 0;
             
@@ -291,11 +292,27 @@ class LdapUserController extends BaseController
                     
                     $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
                     
-                    if(is_null($user)){
+                    $dnRegion = 'ou='.$record['Region'].','.$dn;
+                    $dnStructure = "ou=".$record['Structure'].",".$dnRegion;
+                    $structureLdap = OrganizationalUnit::find($dnStructure);
+                    $regionLdap = OrganizationalUnit::find($dnRegion);
+                    
+                    if(is_null($user) && !is_null($structureLdap) && !is_null($regionLdap) && !empty($record['Region'])){
                         $user = (new User)->inside('ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
-                        $user->cn = $record['Prenom'].' '.$record['Nom'];
+                        $user->setDn('cn='.$record['Prenom'].' '.$record['Nom'].',ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
+                        //$user->cn = ldap_escape($record['Prenom'].' '.$record['Nom']);
                         $user->unicodePwd = '';
-                        $user->samaccountname = strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom']));
+                        $user->samaccountname = strtolower($record['Prenom'][0]);
+                        if(strpos($record['Prenom'], '-')){
+                            $prenoms = explode('-', $record['Prenom']);                            
+                            
+                            $prenomusername = ''; 
+                            foreach($prenoms as $prenom){
+                                $prenomusername.= strtolower($prenom[0]);
+                            }
+                            $user->samaccountname = $prenomusername;
+                        }
+                        $user->samaccountname .= strtolower($utilphp->sanitize_string($record['Nom']));
                         $user->mail = $record['email'];
                         $user->userAccountControl = 512;
                         $user->pwdlastset = 0;
@@ -304,17 +321,18 @@ class LdapUserController extends BaseController
                             $user->save();
                             $userAdded++;
                             $logger->info($tsl->trans("userAdded").$userAdded);
+                            
                         } catch (\LdapRecord\LdapRecordException $e) {
                             // Failed saving user.
-                            $userError++;
+                            /*$userError++;
                             $logger->error($tsl->trans("userAddError").implode(", ".$record));
-                            $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotAdded", ['name'=>$record['Prenom'].' '.$record['Nom']])];
+                            $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotAdded", ['name'=>$record['Prenom'].' '.$record['Nom']])];*/
                         }
                     }else{
                         $userExists[]= $record['Prenom'].' '.$record['Nom'];
                         $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotAdded", ['name'=>$record['Prenom'].' '.$record['Nom']])];
                         $userError++;                       
-                    }                    
+                    }
     
                 }                
                 
@@ -334,7 +352,8 @@ class LdapUserController extends BaseController
                 }
                 
             }
-            unlink('../uploads/user.csv');
+            dump(realpath('../uploads/user.csv'));
+            unlink(realpath('../uploads/user.csv'));
             
             $logger->info($tsl->trans("userAdded", ["nombre"=>$userAdded]));
             $logger->info($tsl->trans("userBulkProcessEnd"));
@@ -380,7 +399,11 @@ class LdapUserController extends BaseController
             $csv->setDelimiter(";");
             $csv->setHeaderOffset(0); //set the CSV header offset
             
-            $csvHeader =$csv->getHeader();
+            $csvHeader =$csv->getHeader();            
+            $userTotal = $csv->count();
+            
+            $session = $request->getSession();
+            $session->set('importProgress', 0);
 
             $response->setData(['type'=>"success", "message"=>$tsl->trans("fileVerified")]);
             if(count($csvHeader)<5){
@@ -508,7 +531,7 @@ class LdapUserController extends BaseController
                 $user = (new User)->inside($form->get('structure')->getData());
                 $user->cn = $form->get('prenom')->getData().' '.$form->get('nom')->getData();
                 $user->unicodePwd = '';
-                $user->samaccountname = strtolower($form->get('prenom')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('nom')->getData()));
+                $user->samaccountname = ucfirst(strtolower($form->get('prenom')->getData()[0])).strtolower($utilphp->sanitize_string($form->get('nom')->getData()));
                 $user->mail = $form->get('mail')->getData();
                 $user->userAccountControl = 512;
                 $user->pwdlastset = 0;
@@ -660,4 +683,19 @@ class LdapUserController extends BaseController
         ]);
     }
     
+    /**
+     * @Route("/user/resetpwd/{id}", name="user_resetpwd")
+     */
+    public function resetpwd(int $id, Request $request): Response
+    {
+        
+    }
+    
+    /**
+     * @Route("/user/groupadd/{id}", name="user_groupadd")
+     */
+    public function groupadd(int $id, Request $request): Response
+    {
+        
+    }
 }

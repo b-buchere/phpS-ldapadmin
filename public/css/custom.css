@@ -114,3 +114,7 @@ font-size: 1em;
   border-color: #474644 !important;
   background-color: #474644 !important
 }
+
+.bi.bi-fa{
+  vertical-align: 0.125em!important
+}
