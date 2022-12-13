@@ -45,22 +45,8 @@
     <p class="callout callout-info p-1 mt-3">{% trans %}usercreate.info{% endtrans %}</p>
     {% if form.vars.data.id %}
     <div class="">
-        <h2>Membre de | 
-        <a class="text-decoration-none text-body fs-5" href="{{ path('ldapadmin_user_groupadd', {id: form.vars.data.id}) }}">
-            <span class="me-3">
-              <span id="add_group" class="fa-stack small">
-                <i class="fa-solid fa-users fa-stack-2x"></i>
-                <i class="fa-solid fa-plus fa-stack-1x"></i>
-              </span>
-              {{ 'groupAdd'|trans }}
-           </span>
-        </a></h2>
-        <div class="border border-dark rounded p-2 w-50 mb-2">
-            {% for groupe in form.vars.data.groupes %}
-                {{ groupe.nom }}{% if not loop.last %}, {% endif %}
-            {% endfor %}
-            
-        </div>
+        <h2>Membre de</h2>
+        {{ form_widget(form.Groupes) }}
     </div>
     {% endif %}
     

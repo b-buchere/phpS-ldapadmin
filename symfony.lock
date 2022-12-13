@@ -539,6 +539,9 @@
     "symfony/yaml": {
         "version": "v5.4.3"
     },
+    "tetranz/select2entity-bundle": {
+        "version": "v3.1.0"
+    },
     "tightenco/collect": {
         "version": "v8.83.12"
     },

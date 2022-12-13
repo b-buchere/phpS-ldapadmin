@@ -32,7 +32,7 @@
 /vendor/
 
 # Assets and user uploads
-/web/bundles/
+/public/bundles/
 /web/uploads/
 
 # PHPUnit

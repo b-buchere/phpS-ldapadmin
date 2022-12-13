@@ -10,6 +10,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserProviderInterface;
 use Symfony\Component\Security\Core\Security;
+use Symfony\Component\Security\Http\ParameterBagUtils;
 use Symfony\Component\Security\Http\Authenticator\AbstractLoginFormAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\CsrfTokenBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
@@ -23,6 +24,9 @@ use LdapRecord\Auth\Events\Failed;
 use LdapRecord\Models\ActiveDirectory\User;
 use LdapRecord\Connection;
 use Symfony\Component\HttpFoundation\ParameterBag;
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Security\Http\HttpUtils;
 
 class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 {
@@ -31,12 +35,14 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
     public const LOGIN_ROUTE = 'login';
 
     private UrlGeneratorInterface $urlGenerator;
-
-    public function __construct(UserProviderInterface $userProvider, UrlGeneratorInterface $urlGenerator, ParameterBagInterface $params )
+	protected $httpUtils;
+	
+    public function __construct(UserProviderInterface $userProvider, UrlGeneratorInterface $urlGenerator, ParameterBagInterface $params, HttpUtils $httpUtils )
     {
         $this->urlGenerator = $urlGenerator;
         $this->userProvider = $userProvider;
         $this->params = $params;
+		$this->httpUtils = $httpUtils;
     }
 
     public function authenticate(Request $request): PassportInterface
@@ -77,13 +83,15 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
-
+        if ($targetUrl = $request->headers->get('Referer')) {
+            if (false !== $pos = strpos($targetUrl, '?')) {
+                $targetUrl = substr($targetUrl, 0, $pos);
+            }
+            if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
+                return $targetUrl;
+            }
+        }
         // For example:
-        return new RedirectResponse($this->urlGenerator->generate('home'));
-    }
-
-    protected function getLoginUrl(Request $request): string
-    {
-        return $this->urlGenerator->generate(self::LOGIN_ROUTE);
+        return new RedirectResponse($this->urlGenerator->generate('ldapadmin_index'));
     }
 }

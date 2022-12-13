@@ -2,12 +2,12 @@
 
 $(document).ready(function() {
 
-    $('#ldap_user_create_lastname').on('change', function(e){
-        $('#ldap_user_create_fullname').val($('#ldap_user_create_firstname').val()+' '+$(this).val());
+    $('#ldap_user_create_nom').on('change', function(e){
+        $('#ldap_user_create_fullname').val($('#ldap_user_create_prenom').val()+' '+$(this).val());
     });
 
-    $('#ldap_user_create_firstname').on('change', function(e){
-        $('#ldap_user_create_fullname').val($(this).val()+' '+$('#ldap_user_create_lastname').val());
+    $('#ldap_user_create_prenom').on('change', function(e){
+        $('#ldap_user_create_fullname').val($(this).val()+' '+$('#ldap_user_create_nom').val());
     });
 	$('#ldap_user_create_region').on('change', function(e){
         
@@ -22,6 +22,29 @@ $(document).ready(function() {
         });
     });
     
+    $('#groupAdd').on('click', function (e){
+        e.preventDefault();
+        $.ajax({
+            url: $(this).attr('href'),
+            method: 'POST',
+            data: {
+                dn:$(this)[0].value
+            }
+        }).done(function(asyncContent ){
+            $('#ldap_user_create_structure').html(asyncContent);
+        });
+    });
+
+    $('#ldap_user_create_Groupes').select2({
+        tags:true,
+        tokenSeparators: [',',' '],
+        theme: 'bootstrap-5'
+    });
+    $('#ldap_user_create_Groupes').parent().find('.select2-selection').addClass(
+        $('#ldap_user_create_Groupes').attr('class')
+    );
+    $('#ldap_user_create_Groupes').parent().find('.select2-selection').removeClass('select2-hidden-accessible');
+    $('#ldap_user_create_Groupes').parent().find('.select2-selection').removeClass('w-50');
 });
 
 (function(window, $) {
@@ -83,4 +106,5 @@ $(document).ready(function() {
 			});
         }
     });
+    
 })(window, jQuery);

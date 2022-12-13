@@ -78,6 +78,7 @@ class Groupes
 
     public function addMembre(Utilisateurs $membre): self
     {
+        
         if (!$this->membres->contains($membre)) {
             $this->membres[] = $membre;
         }

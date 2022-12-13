@@ -28,6 +28,7 @@ security:
                 query_string: '(|(sAMAccountName={username}))'
                 search_dn: '%env(AD_PASSWORDCHANGER_USER)%'
                 search_password: '%env(AD_PASSWORDCHANGER_PWD)%'
+                default_target_path: 'ldapadmin_index'
             entry_point: form_login_ldap
             custom_authenticator: App\Security\LoginFormAuthenticator
             switch_user: true

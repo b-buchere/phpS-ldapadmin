@@ -15,6 +15,9 @@ use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Choice;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Entity\Utilisateurs;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use App\Entity\Groupes;
+use Doctrine\ORM\EntityRepository;
 
 class LdapUserCreateType extends AbstractType
 {
@@ -42,6 +45,7 @@ class LdapUserCreateType extends AbstractType
                 'structure',
                 ChoiceType::class,
                 [
+                    'mapped'=>false,
                     'data'=>$data['structure'],
                     'choices'=>$aStructure,
                     'label'=>"structure",
@@ -206,6 +210,20 @@ class LdapUserCreateType extends AbstractType
                     'row_attr'=>[
                         'class'=>"col-6"
                     ],
+                ]
+            )->add(
+                'Groupes',
+                EntityType::class,
+                [
+                    'class'=>Groupes::class,
+                    'multiple'=>true,
+                    'choice_label'=>'nom',
+                    'query_builder' => function(EntityRepository $er){
+                        return $er->createQueryBuilder('g');
+                    },
+                    'attr'=>[
+                        'class'=>"border border-dark rounded p-2 w-50 mb-2"
+                    ]
                 ]
             )->add(
                 'valid',

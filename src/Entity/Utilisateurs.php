@@ -135,6 +135,7 @@ class Utilisateurs
 
     public function addGroupe(Groupes $groupe): self
     {
+        dump($this->groupes->contains($groupe));
         if (!$this->groupes->contains($groupe)) {
             $this->groupes[] = $groupe;
             $groupe->addMembre($this);
@@ -151,6 +152,7 @@ class Utilisateurs
 
         return $this;
     }
+    
     /**
      * @return mixed
      */

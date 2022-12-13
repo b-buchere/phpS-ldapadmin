@@ -42,6 +42,7 @@ class IndexController extends BaseController
      */
     public function index(): Response
     {      
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
         return $this->render('index.html.twig', [
         ]);
     }
