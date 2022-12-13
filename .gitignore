@@ -33,7 +33,7 @@
 
 # Assets and user uploads
 /public/bundles/
-/public/bundles/**
+/public/bundles**
 /web/uploads/
 
 # PHPUnit
