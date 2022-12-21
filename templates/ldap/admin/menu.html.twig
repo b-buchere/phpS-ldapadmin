@@ -5,9 +5,11 @@
                 <li class="nav-item">
                     <a class="nav-link {% if activeMenu == "user_list" %}active{% endif %}" href="{{ path('ldapadmin_userlist') }}">Utilisateurs actifs</a>
                 </li>
+                {% if is_granted('create', user) %}
                 <li class="nav-item">
                     <a class="nav-link {% if activeMenu == "user_create" %}active{% endif %}" href="{{ path('ldapadmin_usercreate') }}">{{ "createUser" |trans }}</a>
                 </li>
+                {% endif %}
             </ul>
         </li>
         
@@ -17,11 +19,14 @@
                 <li>
                     <a class="nav-link {% if activeMenu == "group_list" %}active{% endif %}" href="{{ path('ldapadmin_grouplist') }}">{{ "AllGroup" |trans }}</a>
                 </li>
+                {% if is_granted('create', user) %}
                 <li>
                     <a class="text-white nav-link {% if activeMenu == "group_create" %}active{% endif %}" href="{{ path('ldapadmin_groupcreate') }}">{{ "groupCreate" |trans }}</a>
                 </li>
+                {% endif %}
             </ul>
         </li>
+        {% if is_granted('create', user) %}
         <li>
             Importation
             <ul class="nav d-block">
@@ -33,6 +38,7 @@
                 </li>
             </ul>
         </li>
+        {% endif %}
     </ul>
 
   </div>

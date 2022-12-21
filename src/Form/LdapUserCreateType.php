@@ -216,6 +216,7 @@ class LdapUserCreateType extends AbstractType
                 EntityType::class,
                 [
                     'class'=>Groupes::class,
+                    'required'=>false,
                     'multiple'=>true,
                     'choice_label'=>'nom',
                     'query_builder' => function(EntityRepository $er){

@@ -15,6 +15,7 @@ use LdapRecord\Models\Attributes\DistinguishedName;
 use LdapRecord\Utilities;
 use LdapRecord\Models\ActiveDirectory\Group;
 use App\Form\LdapGetinfoType;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class IndexController extends BaseController
 {
@@ -43,8 +44,7 @@ class IndexController extends BaseController
     public function index(): Response
     {      
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-        return $this->render('index.html.twig', [
-        ]);
+        return $this->redirectToRoute('ldapadmin_index');
     }
 	
 	/**

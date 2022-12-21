@@ -127,32 +127,32 @@ class LdapUserController extends BaseController
         
         $form->handleRequest($request);
         
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
+        
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             /**
              * @var UploadedFile $file
              */
             $file = $data['fileimport'];
-            $file->move('../uploads', 'usergroup.csv');
-            
-            $server = $this->getParameter('ldap_server');
-            $dn = $this->getParameter('ad_base_dn');
-            $user_admin = $this->getParameter('ad_passwordchanger_user');
-            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-            
-            // Create a new connection:
-            $connection = new Connection([
-                'hosts' => [$server],
-                'port' => 389,
-                'base_dn' => $dn,
-                'username' => $user_admin,
-                'password' => $user_pwd,
-                'use_tls'  => true
-            ]);
-            
-            $connection->connect();
-            
-            Container::addConnection($connection);
+            $file->move('../uploads', 'usergroup.csv');           
             
             $csv = Reader::createFromPath('../uploads/usergroup.csv', 'r');
             $csv->setDelimiter(";");
@@ -212,6 +212,7 @@ class LdapUserController extends BaseController
         }
         
         return $this->render('ldap/admin/userbulk.html.twig', [
+            'user'=>$this->getUser(),
             'form'=>$form->createView(),
             'activeMenu'=>"user_group_update",
             'title'=>"userGroupImport"
@@ -229,7 +230,24 @@ class LdapUserController extends BaseController
         $form = $this->createForm(LdapUserbulkType::class, null, ['help_message'=>$tsl->trans("fileimportVerifyProgress")]);
         
         $form->handleRequest($request);
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
         
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
         if ($form->isSubmitted() && $form->isValid()) {
             $logger->info($tsl->trans("bulUserProcessStart"));
             $data = $form->getData();
@@ -238,25 +256,6 @@ class LdapUserController extends BaseController
              */
             $file = $data['fileimport'];
             $file->move('../uploads', 'user.csv');
-
-            $server = $this->getParameter('ldap_server');
-            $dn = $this->getParameter('ad_base_dn');
-            $user_admin = $this->getParameter('ad_passwordchanger_user');
-            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-            
-            // Create a new connection:
-            $connection = new Connection([
-                'hosts' => [$server],
-                'port' => 389,
-                'base_dn' => $dn,
-                'username' => $user_admin,
-                'password' => $user_pwd,
-                'use_tls'  => true
-            ]);
-            
-            $connection->connect();
-            
-            Container::addConnection($connection);
             
             $csv = Reader::createFromPath('../uploads/user.csv', 'r');
             $csv->setDelimiter(";");
@@ -372,6 +371,7 @@ class LdapUserController extends BaseController
         
         
         return $this->render('ldap/admin/userbulk.html.twig', [
+            'user'=>$this->getUser(),
             'form'=>$form->createView(),
             'activeMenu' => "user_import",
             'title'=>"userImport"
@@ -528,9 +528,9 @@ class LdapUserController extends BaseController
         
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-
+            $groupeFormData = $form->get('Groupes')->getData();
             $utilphp = new util();
-
+            
             $user = User::findBy('samaccountname', strtolower($form->get('prenom')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('nom')->getData())));
             
             if(is_null($user)){
@@ -545,25 +545,42 @@ class LdapUserController extends BaseController
                 try {
                     $user->save();
                     
+                    dump($user->getAttributes());
                     $userDb->setDn($user->getDn());
                     $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
-                    $userDb->setNom($user->getConnectionName());
-                    $userDb->setCourriel($user->getAttribute('mail'));
+                    $userDb->setNom($form->get('nom')->getData());
+                    $userDb->setCourriel($user->getAttribute('mail')[0]);
+                    
+                    foreach( $groupeFormData as $groupe ){
+                        /**
+                         * @var Groupes $groupe
+                         */
+                        
+                        $groupe->addMembre($userDb);
+                        $this->em->persist($groupe);
+                        
+                        $ldadGroupe = Group::find($groupe->getDn());
+                        
+                        $user->groups()->attach($ldadGroupe);
+                        
+                    }          
                     
                     $this->em->persist($userDb);
                     $this->em->flush();
                     
                     $this->addFlash("success", "userCreated");
+                    return $this->redirectToRoute('ldapadmin_useredit', ['id'=>$userDb->getId()]);
                 } catch (\LdapRecord\LdapRecordException $e) {
                     // Failed saving user.
                 }
             }else{
-                $this->addFlash("error", "userAlreadyExists");
+                $this->addFlash("error", "userOneAlreadyExists");
             }
 
         }
         
         return $this->render('ldap/admin/usercreate.html.twig', [
+            'user'=>$this->getUser(),
             'form'=>$form->createView(),
             "activeMenu" =>"user_create",
             'title'=>"createUser"
@@ -686,6 +703,7 @@ class LdapUserController extends BaseController
         }
         
         return $this->render('ldap/admin/usercreate.html.twig', [
+            'user'=>$this->getUser(),
             'form'=>$form->createView(),
             "activeMenu" =>"user_create",
             'title'=>$userDb->getPrenom().' '.$userDb->getNom()
@@ -704,6 +722,25 @@ class LdapUserController extends BaseController
         $this->headerExt->headScript->appendFile('https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js');
         $this->headerExt->headStyle->appendStyle('//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css');
         
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
+        
         $isAjax = $request->isXmlHttpRequest();
         
         $ajaxUrl = $this->generateUrl('ldapadmin_userlist');
@@ -718,7 +755,7 @@ class LdapUserController extends BaseController
         }    
         
         return $this->render('ldap/admin/userlist.html.twig', [
-            
+            "user"=>$this->getUser(),
             "activeMenu" =>"user_list",
             'title'=>"AllUser",
             'datatable'=>$datatable

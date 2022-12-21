@@ -5,15 +5,6 @@
       <tool tool-id="symfony" tool-name="Symfony"/>
     </header>
     <body>
-      <trans-unit id="la5or9T" resname="Veuillez choisir un document csv">
-        <source>Veuillez choisir un document csv</source>
-        <target></target>
-        <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:35</note>
-        <note priority="1">sambaldap\src\Form\LdapUserbulkType.php:36</note>
-        <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:35</note>
-        <note priority="1">sambaldap\src\Form\LdapUserbulkType.php:36</note>
-        <note priority="1">new</note>
-      </trans-unit>
       <trans-unit id="zh5oKD9" resname="This value should be false.">
         <source>This value should be false.</source>
         <target>Cette valeur doit être fausse.</target>
@@ -2407,6 +2398,15 @@
         <note priority="1">obsolete</note>
         <note priority="1">obsolete</note>
         <note priority="1">obsolete</note>
+      </trans-unit>
+      <trans-unit id="la5or9T" resname="Veuillez choisir un document csv">
+        <source>Veuillez choisir un document csv</source>
+        <target></target>
+        <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:35</note>
+        <note priority="1">sambaldap\src\Form\LdapUserbulkType.php:36</note>
+        <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:35</note>
+        <note priority="1">sambaldap\src\Form\LdapUserbulkType.php:36</note>
+        <note priority="1">new</note>
       </trans-unit>
     </body>
   </file>

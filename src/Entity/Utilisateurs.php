@@ -47,7 +47,7 @@ class Utilisateurs
     /**
      * @ORM\Column(type="boolean", options={"default":"0"})
      */
-    private $hidden;
+    private $hidden = 0;
     
     /**
      * @ORM\ManyToMany(targetEntity=Groupes::class, mappedBy="membres")

@@ -129,7 +129,24 @@ class LdapGroupController extends BaseController
         $form = $this->createForm(LdapUserbulkType::class, null, ['help_message'=>$tsl->trans("fileimportVerifyProgress")]);
         
         $form->handleRequest($request);
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
         
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
         if ($form->isSubmitted() && $form->isValid()) {
             $logger->info($tsl->trans("bulUserProcessStart"));
             $data = $form->getData();
@@ -253,6 +270,7 @@ class LdapGroupController extends BaseController
         
         
         return $this->render('ldap/admin/userbulk.html.twig', [
+            'user'=>$this->getUser(),
             'form'=>$form->createView(),
             'activeMenu' => "user_import",
             'title'=>"userImport"
@@ -363,26 +381,25 @@ class LdapGroupController extends BaseController
         $form = $this->createForm(LdapGroupcreateType::class, null);
         
         $form->handleRequest($request);
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+        ]);
+        
+        // Add the connection into the container:
+        Container::addConnection($connection);
         
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
-            
-            $server = $this->getParameter('ldap_server');
-            $dn = $this->getParameter('ad_base_dn');
-            $user_admin = $this->getParameter('ad_passwordchanger_user');
-            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-            
-            // Create a new connection:
-            $connection = new Connection([
-                'hosts' => [$server],
-                'port' => 389,
-                'base_dn' => $dn,
-                'username' => $user_admin,
-                'password' => $user_pwd,
-            ]);
-            
-            // Add the connection into the container:
-            Container::addConnection($connection);
             // connexion � un compte pour la lecture de l'annuaire
             
             
@@ -396,6 +413,7 @@ class LdapGroupController extends BaseController
             $group->save();
         }
         return $this->render('ldap/admin/groupcreate.html.twig', [
+            'user'=>$this->getUser(),
             'form'=>$form->createView(),
             "activeMenu"=>"group_create",
             'title'=>"groupCreate"
@@ -414,6 +432,23 @@ class LdapGroupController extends BaseController
         $this->headerExt->headScript->appendFile('https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js');
         $this->headerExt->headStyle->appendStyle('//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css');
         
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+        ]);
+        
+        // Add the connection into the container:
+        Container::addConnection($connection);
+        
         $isAjax = $request->isXmlHttpRequest();
         
         $ajaxUrl = $this->generateUrl('ldapadmin_grouplist');
@@ -428,7 +463,7 @@ class LdapGroupController extends BaseController
         }    
         
         return $this->render('ldap/admin/grouplist.html.twig', [
-            
+            'user'=>$this->getUser(),
             "activeMenu" =>"group_list",
             'title'=>"AllGroup",
             'datatable'=>$datatable

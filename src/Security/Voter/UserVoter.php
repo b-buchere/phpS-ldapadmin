@@ -44,10 +44,11 @@ class UserVoter extends Voter
         
         switch ($attribute) {
             case self::CREATE:
-                $group = Group::find('CN=Administrators,CN=Builtin,DC=ncunml,DC=ass');
+                $groupLdapAdmin = Group::find('CN=Administrators,CN=Builtin,DC=ncunml,DC=ass');
+                $groupAppliAdmin = Group::find('CN=GG_ADMIN,OU=Groupes,OU=ALPHA-ORIONIS,DC=ncunml,DC=ass');
                 $userEntry = $user->getEntry();
 
-                return $userEntry->groups()->exists($group);
+                return $userEntry->groups()->exists($groupLdapAdmin) || $userEntry->groups()->exists($groupAppliAdmin);
                 break;
             case self::EDIT:
                 break;

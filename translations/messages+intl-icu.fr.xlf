@@ -21,7 +21,6 @@
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="FvnrpG8" resname="createUser">
-      
         <source>createUser</source>
         <target>Créer un utilisateur</target>
         <note priority="1">obsolete</note>
@@ -153,7 +152,7 @@
       </trans-unit>
       <trans-unit id="fa.af1v" resname="Les utilisateurs ont été mis à jour">
         <source>Les utilisateurs ont été mis à jour</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Controller\LdapUserController.php:193</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -172,7 +171,7 @@
       </trans-unit>
       <trans-unit id="muHUtz7" resname="userCreated">
         <source>userCreated</source>
-        <target></target>
+        <target state="translated">L'utilisateur a été créé</target>
         <note priority="1">sambaldap\src\Controller\LdapUserController.php:373</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -218,21 +217,21 @@
       </trans-unit>
       <trans-unit id="tMwZk9m" resname="Nom de l'OU">
         <source>Nom de l'OU</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\LdapOucreateType.php:23</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="qoGpg2r" resname="ouName">
         <source>ouName</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\LdapOucreateType.php:26</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="47DEQpj" resname="">
-        <source></source>
-        <target></target>
+        <source/>
+        <target/>
       </trans-unit>
       <trans-unit id="UgzbVjv" resname="structure">
         <source>structure</source>
@@ -279,7 +278,7 @@
       </trans-unit>
       <trans-unit id="uecbvpy" resname="Fichier à importer">
         <source>Fichier à importer</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:21</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -312,21 +311,21 @@
       </trans-unit>
       <trans-unit id="pbSAYgl" resname="New password cnfm">
         <source>New password cnfm</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\PasswordChangePromptType.php:17</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="PdnfREH" resname="New password">
         <source>New password</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\PasswordChangePromptType.php:17</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="szwn32b" resname="Adresse email">
         <source>Adresse email</source>
-        <target></target>
+        <target/>
         <note priority="1">sambaldap\src\Form\PasswordChangeRequestType.php:19</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -409,7 +408,7 @@
       </trans-unit>
       <trans-unit id="QggSnn5" resname="userCreate">
         <source>userCreate</source>
-        <target state="needs-translation"></target>
+        <target state="needs-translation"/>
       </trans-unit>
       <trans-unit id="vf2RxTR" resname="AllUser">
         <source>AllUser</source>
@@ -419,7 +418,7 @@
         <source>bulkVerifyFile</source>
         <target>__bulkVerifyFile</target>
       </trans-unit>
-      <trans-unit id="GaoxIRn" resname="groupAdd">
+      <trans-unit id="h3sK2OG" resname="groupAdd">
         <source>groupAdd</source>
         <target state="translated">Ajouter un groupe</target>
       </trans-unit>
@@ -445,7 +444,11 @@
       </trans-unit>
       <trans-unit id="xmMNOPL" resname="resetPwd">
         <source>resetPwd</source>
-        <target state="translated">Réinitiliser le mot de passe utlisateur</target>
+        <target state="translated">Réinitialiser le mot de passe utlisateur</target>
+      </trans-unit>
+      <trans-unit id=".XNISNC" resname="userOneAlreadyExists">
+        <source>userOneAlreadyExists</source>
+        <target state="translated">L'utilisateur existe déjà.</target>
       </trans-unit>
     </body>
   </file>
