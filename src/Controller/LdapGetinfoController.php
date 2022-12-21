@@ -158,28 +158,30 @@ class LdapGetinfoController extends BaseController
         
         $form->handleRequest($request);
         
+        
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+        ]);
+        
+        // Add the connection into the container:
+        Container::addConnection($connection);
+        // connexion � un compte pour la lecture de l'annuaire
+        
         $aParsedResult = [];
         if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
             $user = $data['User'];
-            
-            $server = $this->getParameter('ldap_server');
-            $dn = $this->getParameter('ad_base_dn');
-            $user_admin = $this->getParameter('ad_passwordchanger_user');
-            $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
-            
-            // Create a new connection:
-            $connection = new Connection([
-                'hosts' => [$server],
-                'port' => 389,
-                'base_dn' => $dn,
-                'username' => $user_admin,
-                'password' => $user_pwd,
-            ]);
-            
-            // Add the connection into the container:
-            Container::addConnection($connection);
-            // connexion � un compte pour la lecture de l'annuaire
+
             
             $query = $connection->query();
             
@@ -235,6 +237,7 @@ class LdapGetinfoController extends BaseController
         }
         
         return $this->render('ldap/navbar.html.twig', [
+            'user'=>$this->getUser(),
             'activeMenu'=>'',
             'results'=> $aParsedResult
         ]);
