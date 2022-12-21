@@ -119,7 +119,7 @@ class LdapGroupController extends BaseController
     }
     
     /**
-     * @Route("/group/bulk", name="bulk")
+     * @Route("/bulk", name="bulk")
      */
     public function bulk(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): Response
     {
@@ -235,7 +235,7 @@ class LdapGroupController extends BaseController
                         $userError++;                       
                     }                    
     
-                }                
+                }
                 
                 $session->set('importProgress', 100);
                 
@@ -283,7 +283,7 @@ class LdapGroupController extends BaseController
     public function bulkVerifyFile(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): JsonResponse
     {
 
-        $form = $this->createForm(LdapUserbulkType::class, null);
+        $form = $this->createForm(LdapUserGroupUpdateType::class, null);
         
         $form->handleRequest($request);
         $response = new JsonResponse();
@@ -294,28 +294,27 @@ class LdapGroupController extends BaseController
              * @var UploadedFile $file
              */
             $file = $data['fileimport'];
-            $file->move('../uploads', 'group.csv');
+            $file->move('../uploads', 'usergroup.csv');
 
-            $csv = Reader::createFromPath('../uploads/user.csv', 'r');
+            $csv = Reader::createFromPath('../uploads/usergroup.csv', 'r');
             $csv->setDelimiter(";");
             $csv->setHeaderOffset(0); //set the CSV header offset
             
             $csvHeader =$csv->getHeader();
 
             $response->setData(['type'=>"success", "message"=>$tsl->trans("fileVerified")]);
-            if(count($csvHeader)<5){
+            if(count($csvHeader)<3){
                 $this->addFlash("danger", "fileError");
                 $logger->error($tsl->trans("fileError"));
                 $response->setData(['type'=>"danger", "message"=>$tsl->trans("fileError")]);
                 return $response;
             }
-            unlink('../uploads/user.csv');
-
+            unlink('../uploads/usergroup.csv');
             
             return $response;
         }        
         
-        $response->setData(['type'=>"danger", "message"=>$tsl->trans("fileError")]);
+        $response->setData(['type'=>"dangertest", "message"=>$tsl->trans("fileError")]);
         return $response;
     }
     

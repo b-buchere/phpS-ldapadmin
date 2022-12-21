@@ -119,9 +119,10 @@ class LdapUserController extends BaseController
     /**
      * @Route("/usergroupupdate", name="usergroupupdate")
      */
-    public function GroupUpdate(Request $request): Response
+    public function GroupUpdate(Request $request, LoggerInterface $logger, TranslatorInterface $tsl): Response
     {
         $this->initHtmlHead();
+        $this->headerExt->headScript->appendFile('/js/ldapbulkuser.js');
         
         $form = $this->createForm(LdapUserGroupUpdateType::class, null);
         
@@ -158,57 +159,91 @@ class LdapUserController extends BaseController
             $csv->setDelimiter(";");
             $csv->setHeaderOffset(0); //set the CSV header offset
             
-            $records = $csv->getRecords();
-            
             $utilphp = new util();
+            $lineError = [];
             $noUser = [];
-            $error = false;
-            foreach ($records as $record) {
-                /**
-                 * @var User $user
-                 */
-                $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
-                $group = Group::find('cn='.$record['Groupe'].',ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
-                
-                if(!is_null($user)){                    
-                    try {
-                        if(is_null($group)){
-                            $group = (new Group)->inside('ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
-                            $group->cn = $record['Groupe'];
-                            $group->save();
-                        }
-                        /**
-                         * @var 
-                         */
-                        $userGroup = $user->groups()->attachMany($models);
-                        if ($user->groups()->attach($group)) {
-                            // Successfully added the group to the user.
-                        }
-                        
-                        $user->save();
-                    } catch (\LdapRecord\LdapRecordException $e) {
-                        // Failed saving user.
-                    }
-                }else{
-                    $error =true;
-                    $noUser[] = $record['Prenom'].' '.$record['Nom'];                    
-                }
-            }
             
-            if(!empty($noUser)){
-                $this->addFlash('danger', "Le ou les utilisateur.s suivant.s n'existe.nt pas : <br/>". implode('<br/>',$noUser));
+            $records = $csv->getRecords();
+            $csvHeader =$csv->getHeader();
+            $userTotal = $csv->count();
+            $error = false;            
+            
+            $userUpdated = 0;
+            $userError = 0;
+            $session = $request->getSession();
+            if(count($csvHeader)<3){
+                $this->addFlash("danger", "fileError");
+                $logger->error($tsl->trans("fileError"));
+            }else{
+                $logger->info($tsl->trans("userTotal").$userTotal);
                 
+                $session->set('importProgress', 0);
+                $aSessionMessages=[];
+                foreach ($records as $ligne=>$record) {
+                    $session->set('importProgress', floor($userTotal/$ligne*100));
+                    
+                    if( empty($record['Prenom'] || empty($record['Nom'])) ){
+                        $lineError[] = $ligne+1;
+                        $logger->error($tsl->trans("userAddError").implode(", ".$record));
+                        $userError++;
+                        $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userLineNotAdded", ['line'=>$ligne])];
+                        continue;
+                    }
+
+                    $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
+                    $group = Group::find('cn='.$record['Groupe'].',ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
+                    
+                    if(!is_null($user)){
+                        try {
+                            if(is_null($group)){
+                                $group = (new Group)->inside('ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
+                                $group->cn = $record['Groupe'];
+                                $group->save();
+                            }
+
+                            //$userGroup = $user->groups()->attachMany($models);
+                            if ($user->groups()->attach($group)) {
+                                // Successfully added the group to the user.
+                            }
+                            
+                            $user->save();
+                        } catch (\LdapRecord\LdapRecordException $e) {
+                            // Failed saving user.
+                        }
+                    }else{
+                        $error =true;
+                        $noUser[] = $record['Prenom'].' '.$record['Nom'];
+                        $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotUpdated", ['name'=>$record['Prenom'].' '.$record['Nom']])];
+                        $userError++;
+                    }
+                    
+                }
+                
+                $session->set('importProgress', 100);
+                
+                $noUser = array_unique($noUser);
+                $countNoUsers = count($noUser);
+                if($countNoUsers > 0){
+                    $logger->error($tsl->trans("userNoExists" , ["count"=>$countNoUsers]).implode(', ', $noUser));
+                }
+                
+                $countLineError = count($lineError);
+                if($countLineError > 0){
+                    $logger->error($tsl->trans("fileLineError").implode(', ', $lineError));
+                }
+
             }
             unlink('../uploads/usergroup.csv');
             
-            $this->addFlash('info', "Les utilisateurs ont été mis à jour");
-            if(!$error){
-                return new Response(
-                    ["type"=>"success"],
-                    Response::HTTP_OK,
-                    ['content-type' => 'text/html']
-                );
+            //$this->addFlash('info', "validatedUsersCreated");
+            $aSessionMessages[] = ['type'=>'info','icon'=>'fa-sharp fa-solid fa-check','message'=>$tsl->trans("validatedUsersUpdated")];
+            $aSessionMessages[] = ['type'=>'info','icon'=>'fa-sharp fa-solid fa-check','message'=>$tsl->trans("userTotal", ["nombre"=>$userTotal])];
+            $aSessionMessages[] = ['type'=>'success','icon'=>'fa-sharp fa-solid fa-check','message'=>$tsl->trans("userUpdated", ["nombre"=>$userUpdated])];
+            if(!empty($userError )){
+                $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userCountNotUpdated", ["nombre"=>$userError])];
             }
+            
+            $session->set('reportImport', $aSessionMessages);
         }
         
         return $this->render('ldap/admin/userbulk.html.twig', [
@@ -272,12 +307,13 @@ class LdapUserController extends BaseController
             $userAdded = 0;
             $userError = 0;
             
+            $session = $request->getSession();
             if(count($csvHeader)<5){
                 $this->addFlash("danger", "fileError");
                 $logger->error($tsl->trans("fileError"));
             }else{
                 $logger->info($tsl->trans("userTotal").$userTotal);
-                $session = $request->getSession();
+                
                 $session->set('importProgress', 0);
                 $aSessionMessages=[];
                 foreach ($records as $ligne => $record) {
@@ -353,7 +389,7 @@ class LdapUserController extends BaseController
                 }
                 
             }
-            dump(realpath('../uploads/user.csv'));
+            
             unlink(realpath('../uploads/user.csv'));
             
             $logger->info($tsl->trans("userAdded", ["nombre"=>$userAdded]));
@@ -401,13 +437,13 @@ class LdapUserController extends BaseController
             $csv->setDelimiter(";");
             $csv->setHeaderOffset(0); //set the CSV header offset
             
-            $csvHeader =$csv->getHeader();            
-            $userTotal = $csv->count();
+            $csvHeader =$csv->getHeader();  
             
             $session = $request->getSession();
             $session->set('importProgress', 0);
 
             $response->setData(['type'=>"success", "message"=>$tsl->trans("fileVerified")]);
+
             if(count($csvHeader)<5){
                 $this->addFlash("danger", "fileError");
                 $logger->error($tsl->trans("fileError"));
@@ -458,20 +494,25 @@ class LdapUserController extends BaseController
         $session = $request->getSession();
         
         $aRows = [];
+        
         foreach($session->get('reportImport') as $reportLine){
+            dump($reportLine);
             unset($reportLine['icon']);
             $aRows[]=implode(',',$reportLine);
             
         }
         $content = implode("\n", $aRows);
+        
         file_put_contents("report.csv", utf8_decode($content));
         
         $response = new BinaryFileResponse("report.csv");
         $response->setCharset('ISO-8859-2');
         $response->headers->set('Content-Type', 'text/csv');
         $response->headers->set('Content-Disposition', 'attachment; filename="report.csv"');
+        $response->deleteFileAfterSend(true);
+        
         $response->prepare($request);
-        unlink("report.csv");
+        
         return $response;
     }
     

@@ -9,6 +9,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\File;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class LdapUserbulkType extends AbstractType
 {
@@ -42,17 +43,29 @@ class LdapUserbulkType extends AbstractType
                     ]
                 ]
                 )->add(
-                    'import',
-                    SubmitType::class,
+                    'verifyUrl',
+                    HiddenType::class,
                     [
-                        'label'=>'import',
-                        'row_attr'=>[
-                            'class'=>""
-                        ],
-                        'attr'=>[
-                            "class"=>"btn btn-primary mb-3 col-12"
-                        ]
+                        'data'=> '/ldapadmin/userbulk/verifyfile'
                     ]
+                )->add(
+                    'progressUrl',
+                    HiddenType::class,
+                    [
+                        'data'=> '/ldapadmin/userbulk/progress'
+                    ]
+                )->add(
+                'import',
+                SubmitType::class,
+                [
+                    'label'=>'import',
+                    'row_attr'=>[
+                        'class'=>""
+                    ],
+                    'attr'=>[
+                        "class"=>"btn btn-primary mb-3 col-12"
+                    ]
+                ]
                     );
     }
 

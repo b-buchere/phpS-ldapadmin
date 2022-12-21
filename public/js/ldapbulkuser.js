@@ -27,7 +27,7 @@ $(document).ready(function() {
             this.handleFormSubmit.bind(this)
         );
 
-        this.$wrapper.find('#ldap_userbulk_fileimport').on(
+        this.$wrapper.find('[id$=_fileimport]').on(
             'change',
             this.verifyFile.bind(this)
         );
@@ -42,7 +42,7 @@ $(document).ready(function() {
             $('#reportProgress').removeClass('d-none');
             this.checkProgress();
             $.ajax({
-                url: "/ldapadmin/userbulk",
+                url: form[0].action,
                 method: 'POST',
 				processData: false,
 				contentType: false,
@@ -82,18 +82,19 @@ $(document).ready(function() {
         },
         verifyFile: function(e) {
             var form = $(e.currentTarget.closest('form'));
+            
 			var formData = new FormData(form[0]);
  
-            $('#ldap_userbulk_fileimport_help').removeClass('invisible');
+            $('[id$=_help]').removeClass('invisible');
 
             $.ajax({
-                url: "/ldapadmin/userbulk/verifyfile",
+                url: $('[id$=_verifyUrl]').val(),
                 method: 'POST',
                 processData: false,
 				contentType: false,
                 data: formData
             }).done(function( json ){                
-                $('#ldap_userbulk_fileimport_help').html(json['message']);
+                $('[id$=_help]').html(json['message']);
             });
         }
     });

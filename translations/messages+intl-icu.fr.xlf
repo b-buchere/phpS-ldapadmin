@@ -450,6 +450,26 @@
         <source>userOneAlreadyExists</source>
         <target state="translated">L'utilisateur existe déjà.</target>
       </trans-unit>
+      <trans-unit id="kZnWQWr" resname="userNotUpdated">
+        <source>userNotUpdated</source>
+        <target state="translated">L'utilisateur {name} n'a pas été groupé</target>
+      </trans-unit>
+      <trans-unit id="DxDEZWn" resname="userNoExists">
+        <source>userNoExists</source>
+        <target state="translated">L'utilisateur {name} n'existe pas</target>
+      </trans-unit>
+      <trans-unit id="1SoszdW" resname="validatedUsersUpdated">
+        <source>validatedUsersUpdated</source>
+        <target state="translated">Les utilisateurs validés ont été groupés</target>
+      </trans-unit>
+      <trans-unit id="3jm12JF" resname="userUpdated">
+        <source>userUpdated</source>
+        <target state="translated">Nombre d'utilisateurs groupés : {nombre}</target>
+      </trans-unit>
+      <trans-unit id="nXhTNaO" resname="userCountNotUpdated">
+        <source>userCountNotUpdated</source>
+        <target state="translated">Nombre d'utilisateurs non groupés : {nombre}</target>
+      </trans-unit>
     </body>
   </file>
 </xliff>

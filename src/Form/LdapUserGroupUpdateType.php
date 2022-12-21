@@ -8,6 +8,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Validator\Constraints\File;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class LdapUserGroupUpdateType extends AbstractType
 {
@@ -41,18 +42,30 @@ class LdapUserGroupUpdateType extends AbstractType
                     ]
                 ]
                 )->add(
-                    'valid',
-                    SubmitType::class,
+                    'verifyUrl',
+                    HiddenType::class,
                     [
-                        'label'=>'import',
-                        'row_attr'=>[
-                            'class'=>""
-                        ],
-                        'attr'=>[
-                            "class"=>"btn btn-primary mb-3 col-12"
-                        ]
+                        'data'=> '/ldapadmin/group/bulk/verifyfile'
                     ]
-                    );
+                )->add(
+                    'progressUrl',
+                    HiddenType::class,
+                    [
+                        'data'=> '/ldapadmin/group/bulk/progress'
+                    ]
+                )->add(
+                'valid',
+                SubmitType::class,
+                [
+                    'label'=>'import',
+                    'row_attr'=>[
+                        'class'=>""
+                    ],
+                    'attr'=>[
+                        "class"=>"btn btn-primary mb-3 col-12"
+                    ]
+                ]
+                );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
