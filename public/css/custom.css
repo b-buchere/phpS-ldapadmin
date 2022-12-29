@@ -16,7 +16,7 @@
 
 .bg-ldapadmin-menu .active{
   background-color: transparent!important;
-  border-left : 2px solid #f7a616;
+/*  border-left : 2px solid #f7a616;*/
   padding-left : 12px
 }
 
@@ -117,4 +117,51 @@ font-size: 1em;
 
 .bi.bi-fa{
   vertical-align: 0.125em!important
+}
+
+#ldap_getinfo input:focus{
+  box-shadow: none
+}
+
+#ldap_getinfo > .input-group > .input-group-text{
+  background-color:white
+}
+
+.input-group > :not(:first-child):not(.dropdown-menu):not(.valid-tooltip):not(.valid-feedback):not(.invalid-tooltip):not(.invalid-feedback) {
+  border-left:0px  
+}
+
+.btn-toggle:focus{
+  background-color:transparent!important;
+  outline:none!important;
+  box-shadow:none
+}
+
+.menu-item:hover, .btn-toggle:hover{
+  background-color:rgb(210, 210, 210)
+}
+
+.nav-link{
+  padding-left:1.1rem
+}
+
+.active>.active_indicator{
+  border-left : 2px solid #f7a616; 
+  margin-right:0.5em
+}
+
+#sg-datatables-user_datatable_wrapper .pagination li:not(.disabled)>a,
+#sg-datatables-group_datatable_wrapper .pagination li:not(.disabled)>a{
+  color:rgb(33, 37, 41)
+}
+
+#sg-datatables-user_datatable_wrapper a,
+#sg-datatables-group_datatable_wrapper a{
+  color:rgb(33, 37, 41)
+}
+
+#sg-datatables-user_datatable_wrapper .pagination li.active:not(.disabled)>a,
+#sg-datatables-group_datatable_wrapper .pagination li.active:not(.disabled)>a{
+  color:white;
+    background-color : #474644!important
 }

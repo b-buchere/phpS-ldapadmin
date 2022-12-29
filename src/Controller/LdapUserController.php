@@ -496,7 +496,6 @@ class LdapUserController extends BaseController
         $aRows = [];
         
         foreach($session->get('reportImport') as $reportLine){
-            dump($reportLine);
             unset($reportLine['icon']);
             $aRows[]=implode(',',$reportLine);
             
@@ -586,7 +585,6 @@ class LdapUserController extends BaseController
                 try {
                     $user->save();
                     
-                    dump($user->getAttributes());
                     $userDb->setDn($user->getDn());
                     $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
                     $userDb->setNom($form->get('nom')->getData());
@@ -704,9 +702,8 @@ class LdapUserController extends BaseController
             
             try {
                 
-                dump($userDb);
                 $groupeFormData = $form->get('Groupes')->getData();
-                //$userDb->getGroupes()->clear();
+
                 $user->save();
                 
                 $user->groups()->detachAll();
@@ -739,7 +736,7 @@ class LdapUserController extends BaseController
                 $this->addFlash("success", "userModified");
             } catch (\LdapRecord\LdapRecordException $e) {
                 // Failed saving user.
-                dump($e);
+                //dump($e);
             }
         }
         
@@ -788,7 +785,7 @@ class LdapUserController extends BaseController
         $datatable->buildDatatable(['ajaxUrl'=>$ajaxUrl]);
         
         if ($isAjax) {
-            
+
             $responseService->setQb($this->em->getRepository(Utilisateurs::class)->findAllForDatatableUserRight());
             
             $responseService->setDatatable($datatable);

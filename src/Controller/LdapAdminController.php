@@ -43,7 +43,7 @@ use utilphp\util;
 use App\Form\LdapUserbulkType;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBag;
-use Translation\Extractor\Visitor\Php\Symfony\FlashMessage;
+
 /**
  * @Route("/ldapadmin", name="ldapadmin_")
  */

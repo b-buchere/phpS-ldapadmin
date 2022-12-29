@@ -16,35 +16,37 @@
     <body>
         
         <div class="vh-100 m-0">
-            <header class="p-3 bg-ldapadmin-navbar text-white">
-                <div class="container">
-                  <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start row">
-                    <div class="col-4">
-                        <a href="#" class="d-flex align-items-center me-lg-auto mb-2 mb-lg-0 text-white text-decoration-none fs-4">
-                          <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
+            <header class="p-1 bg-ldapadmin-navbar text-white">
+              <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start row">
+                <div class="col-4">
+                    <div class="text-start">
+                        <a href="#" class="align-items-center me-lg-auto mb-2 mb-lg-0 text-white text-decoration-none fs-4">
+                          <img src="/assets/images/icone_unml.svg" style="height: 31.5px;top: -2.5px;position: relative;"/>
                           Centre d'administration
                         </a>
                     </div>
-                    <div class="col-4">
-                        <form name="ldap_getinfo" method="post" action="{{ path('ldapgetinfo_navbar') }}">
-                            <div id="ldap_getinfo" class="row g-3">
-                                <div class="">
-                                    <input type="text" id="ldap_getinfo_User" name="ldap_getinfo[User]" required="required" placeholder="{{ "userOrGroupSearch"|trans }}" class="form-control">
-                                </div>
-                                <div class="d-none">
-                                    <button type="submit" id="ldap_getinfo_search" name="ldap_getinfo[search]" class="btn btn-primary mb-3 col-12">Rechercher</button>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-4">
-                        <div class="text-end">
-                            <span>{{ app.user.entry.cn[0] }}</span>
-                            <a href="{{ path('logout') }}" class="text-white"><i class="fa-solid fa-power-off fa-2xl"></i></a>
-                        </div>
-                    </div>
-                  </div>
                 </div>
+                <div class="col-4">
+                    <form name="ldap_getinfo" method="post" action="{{ path('ldapgetinfo_navbar') }}">
+                        <div id="ldap_getinfo" class="row g-3">
+                        
+                            <div class="input-group">
+                                <div class="input-group-text"><i class="fa fa-search"></i></div>
+                                <input type="text" id="ldap_getinfo_User" name="ldap_getinfo[User]" required="required" placeholder="{{ "userOrGroupSearch"|trans }}" class="form-control">
+                            </div>
+                            <div class="d-none">
+                                <button type="submit" id="ldap_getinfo_search" name="ldap_getinfo[search]" class="btn btn-primary mb-3 col-12">Rechercher</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-4">
+                    <div class="text-end">
+                        <span>{{ app.user.entry.cn[0] }}</span>
+                        <a href="{{ path('logout') }}" class="text-white"><i class="fa-solid fa-power-off fa-2xl"></i></a>
+                    </div>
+                </div>
+              </div>
             </header>
             <div id="body" class="row m-0">
                 {% include 'ldap/admin/menu.html.twig' %}

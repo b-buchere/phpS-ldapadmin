@@ -89,7 +89,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
                 $targetUrl = substr($targetUrl, 0, $pos);
             }
             
-            if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, $this->options['login_path'])) {
+            if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, 'login')) {
                 return  new RedirectResponse($targetUrl);
             }
         }

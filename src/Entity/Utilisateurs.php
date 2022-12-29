@@ -47,7 +47,7 @@ class Utilisateurs
     /**
      * @ORM\Column(type="boolean", options={"default":"0"})
      */
-    private $hidden = 0;
+    private $hidden;
     
     /**
      * @ORM\ManyToMany(targetEntity=Groupes::class, mappedBy="membres")
@@ -57,6 +57,7 @@ class Utilisateurs
     
     public function __construct()
     {
+        $this->hidden = 0;
         $this->groupes = new ArrayCollection();
     }
 
@@ -135,7 +136,6 @@ class Utilisateurs
 
     public function addGroupe(Groupes $groupe): self
     {
-        dump($this->groupes->contains($groupe));
         if (!$this->groupes->contains($groupe)) {
             $this->groupes[] = $groupe;
             $groupe->addMembre($this);

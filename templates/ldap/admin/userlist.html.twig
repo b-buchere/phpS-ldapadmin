@@ -2,7 +2,7 @@
 
 {% block body %}
 
-<h1>{{ title|trans }}</h1>
+<h1 class="border-bottom border-dark border-2 py-2">{{ title|trans }}</h1>
 
 <script src="//cdn.jsdelivr.net/npm/featherlight@1.7.14/release/featherlight.min.js" type="text/javascript" charset="utf-8"></script>
 
@@ -24,15 +24,14 @@
 <script>
 
 $(document).ready(function(){
-    
-    /*$('dataTable').dataTable( {
-        serverSide: true,
-        ajax: {
-            url: '/admin/product/dtProduct',
-            type: 'POST'
-        }
-    } );*/
 
+    var oTable = $('#sg-datatables-user_datatable').dataTable();
+    $.fn.DataTable.ext.pager.numbers_length = 4;
+
+    $('#sg-datatables-user_datatable_wrapper .bottom').addClass('row');
+    $('#sg-datatables-user_datatable_wrapper .bottom>div').addClass('col-6');
+    $('#sg-datatables-user_datatable_wrapper .bottom>div').addClass('py-0')
+    $('#sg-datatables-user_datatable_wrapper .bottom>div').eq(1).find("label").addClass('float-end');
     $('.dropdown-toggle').on('show.bs.dropdown', function(){
         
     });

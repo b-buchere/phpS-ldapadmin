@@ -40,7 +40,8 @@ class GroupesRepository extends ServiceEntityRepository
     }
     
     public function findAllForDatatable(){
-        return $this->createQueryBuilder('g');
+        return $this->createQueryBuilder('g')
+                    ->andWhere("g.hidden = false")  ;
     }
 
 //    /**

@@ -54,12 +54,13 @@ class GroupDatatable extends BaseDatatable
 
         $this->options->set(array(
             'classes' => 'table table-borderless table-striped table-hover dataTable dtr-inline',
-            'individual_filtering' => true,
+            'individual_filtering' => false,
             'individual_filtering_position' => 'head',
             'order' => array(array(0, 'asc')),
             'order_cells_top' => true,
             //'global_search_type' => 'gt',
-            'search_in_non_visible_columns' => false,
+            'search_in_non_visible_columns' => false,            
+            'dom' => '<"top">ft<"bottom"il>rp<"clear">',
         ));
         $this->columnBuilder
             ->add('id', Column::class, array(

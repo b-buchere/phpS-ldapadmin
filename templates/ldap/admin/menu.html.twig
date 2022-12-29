@@ -1,42 +1,55 @@
-<div class="col-2 p-0 d-flex flex-column flex-shrink-0 p-3 bg-ldapadmin-menu">
+<div class="col-2 p-0 d-flex flex-column flex-shrink-0 p-3 bg-ldapadmin-menu ldapadmin-menu">
     <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item"> Utilisateurs
-            <ul class="nav d-block">
-                <li class="nav-item">
-                    <a class="nav-link {% if activeMenu == "user_list" %}active{% endif %}" href="{{ path('ldapadmin_userlist') }}">Utilisateurs actifs</a>
-                </li>
-                {% if is_granted('create', user) %}
-                <li class="nav-item">
-                    <a class="nav-link {% if activeMenu == "user_create" %}active{% endif %}" href="{{ path('ldapadmin_usercreate') }}">{{ "createUser" |trans }}</a>
-                </li>
-                {% endif %}
-            </ul>
+        <li>
+            <button class="w-100 btn btn-toggle align-items-center rounded collapsed fs-5" data-bs-toggle="collapse" data-bs-target="#user-collapse" aria-expanded="true"> <i class="fa-regular fa-user"></i>&nbsp;Utilisateurs</button>
+            <div id="user-collapse" class="collapse">
+                <ul class="nav d-block">
+                    <li class="menu-item">
+                        <a class="py-1 nav-link {% if activeMenu == "user_list" %}active{% endif %}" href="{{ path('ldapadmin_userlist') }}">
+                            <span class="active_indicator"></span>
+                            <span>Utilisateurs actifs</span>
+                        </a>
+                    </li>
+                    {% if is_granted('create', user) %}
+                    <li class="menu-item">
+                        <a class="py-1 nav-link {% if activeMenu == "user_create" %}active{% endif %}" href="{{ path('ldapadmin_usercreate') }}">
+                            <span class="active_indicator"></span>
+                            <span>{{ "createUser" |trans }}</span>
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
         </li>
         
         <li>
-            Groupe
-            <ul class="nav d-block">
-                <li>
-                    <a class="nav-link {% if activeMenu == "group_list" %}active{% endif %}" href="{{ path('ldapadmin_grouplist') }}">{{ "AllGroup" |trans }}</a>
-                </li>
-                {% if is_granted('create', user) %}
-                <li>
-                    <a class="text-white nav-link {% if activeMenu == "group_create" %}active{% endif %}" href="{{ path('ldapadmin_groupcreate') }}">{{ "groupCreate" |trans }}</a>
-                </li>
-                {% endif %}
-            </ul>
+            <button class="w-100 btn btn-toggle align-items-center rounded collapsed fs-5" data-bs-toggle="collapse" data-bs-target="#group-collapse" aria-expanded="true"><i class="fa-solid fa-users"></i>&nbsp;Groupe</button>
+            <div id="group-collapse" class="collapse">
+                <ul class="nav d-block">
+                    <li class="menu-item">
+                        <a class="py-1 nav-link {% if activeMenu == "group_list" %}active{% endif %}" href="{{ path('ldapadmin_grouplist') }}">{{ "AllGroup" |trans }}</a>
+                    </li>
+                    {% if is_granted('create', user) %}
+                    <li class="menu-item">
+                        <a class="py-1 text-white nav-link {% if activeMenu == "group_create" %}active{% endif %}" href="{{ path('ldapadmin_groupcreate') }}">{{ "groupCreate" |trans }}</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
         </li>
         {% if is_granted('create', user) %}
         <li>
-            Importation
-            <ul class="nav d-block">
-                <li>
-                    <a class="text-white nav-link {% if activeMenu == "user_import" %}active{% endif %}" href="{{ path('ldapadmin_userbulk') }}">Importations d'utilisateurs</a>
-                </li>
-                <li>
-                    <a class="text-white nav-link {% if activeMenu == "user_group_update" %}active{% endif %}" href="{{ path('ldapadmin_usergroupupdate') }}">Importations de groupes</a>
-                </li>
-            </ul>
+            <button class="btn w-100 btn-toggle align-items-center rounded collapsed fs-5" data-bs-toggle="collapse" data-bs-target="#import-collapse" aria-expanded="true"><i class="fa-solid fa-list-check"></i>&nbsp;Importation</button>
+            <div id="import-collapse" class="collapse">
+                <ul class="nav d-block">
+                    <li class="menu-item">
+                        <a class="py-1 text-white nav-link {% if activeMenu == "user_import" %}active{% endif %}" href="{{ path('ldapadmin_userbulk') }}">Importations d'utilisateurs</a>
+                    </li>
+                    <li class="menu-item">
+                        <a class="py-1 text-white nav-link {% if activeMenu == "user_group_update" %}active{% endif %}" href="{{ path('ldapadmin_usergroupupdate') }}">Importations de groupes</a>
+                    </li>
+                </ul>
+            </div>
         </li>
         {% endif %}
     </ul>

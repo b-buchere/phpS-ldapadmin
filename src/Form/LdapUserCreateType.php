@@ -18,6 +18,7 @@ use App\Entity\Utilisateurs;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Entity\Groupes;
 use Doctrine\ORM\EntityRepository;
+use App\Repository\GroupesRepository;
 
 class LdapUserCreateType extends AbstractType
 {
@@ -219,8 +220,8 @@ class LdapUserCreateType extends AbstractType
                     'required'=>false,
                     'multiple'=>true,
                     'choice_label'=>'nom',
-                    'query_builder' => function(EntityRepository $er){
-                        return $er->createQueryBuilder('g');
+                    'query_builder' => function(GroupesRepository $gr){
+                        return $gr->findAllForDatatable();
                     },
                     'attr'=>[
                         'class'=>"border border-dark rounded p-2 w-50 mb-2"

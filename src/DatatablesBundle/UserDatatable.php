@@ -25,10 +25,9 @@ class UserDatatable extends BaseDatatable
         return function(Utilisateurs $user) {
             $row = [];
             $row['id'] = $user->getId();
-            $row['nom'] = $user->getNom();
+            $row['nom'] = $user->getNom().' '.$user->getPrenom();
             $row['identifiant'] = $user->getIdentifiant();
             $row['courriel'] = $user->getCourriel();
-            $row['groupes'] = '';
             $row['groupes'] = '';
             
             $userGroupes = $user->getGroupes();
@@ -61,12 +60,13 @@ class UserDatatable extends BaseDatatable
 
         $this->options->set(array(
             'classes' => 'table table-borderless table-striped table-hover dataTable dtr-inline',
-            'individual_filtering' => true,
+            'individual_filtering' => false,
             'individual_filtering_position' => 'head',
             'order' => array(array(0, 'asc')),
             'order_cells_top' => true,
             //'global_search_type' => 'gt',
             'search_in_non_visible_columns' => false,
+            'dom' => '<"top">ft<"bottom"il>rp<"clear">',
         ));
         $this->columnBuilder
             ->add('id', Column::class, array(
@@ -91,8 +91,8 @@ class UserDatatable extends BaseDatatable
                 'orderable' => true,
             ))
             ->add('groupes', Column::class, [
-                'searchable' => false,
-                'orderable' => true,
+                'searchable' => true,
+                'orderable' => false,
                 'title'=>'Groupes',
                 'width'=>'400',
                 'class_name'=>'text-truncate groupe_col'

@@ -34,8 +34,14 @@ class Groupes
      */
     private $membres;
 
+    /**
+     * @ORM\Column(type="boolean", options={"default":"0"})
+     */
+    private $hidden;
+
     public function __construct()
     {
+        $this->hidden = 0;
         $this->membres = new ArrayCollection();
     }
 
@@ -89,6 +95,18 @@ class Groupes
     public function removeMembre(Utilisateurs $membre): self
     {
         $this->membres->removeElement($membre);
+
+        return $this;
+    }
+
+    public function isHidden(): ?bool
+    {
+        return $this->hidden;
+    }
+
+    public function setHidden(bool $hidden): self
+    {
+        $this->hidden = $hidden;
 
         return $this;
     }
