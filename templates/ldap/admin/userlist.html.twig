@@ -10,13 +10,18 @@
 
     
     <div class="pb-2">
+        {% if is_granted('create', user) %}
         <a class="text-decoration-none text-body" href="{{ path('ldapadmin_usercreate') }}">
             <span class="me-3">
                 <i class="fa-solid fa-user-plus"></i>
                 {{ 'createUser'|trans }}
             </span>
         </a>
-        <a href="#" id ="refreshDatatable" class="bi cursor d-none"><i class="fa-solid fa-rotate"></i>{{ 'refresh' | trans }}</a>
+        {% endif %}
+        <a href="#" id ="refreshDatatable" class="text-decoration-none text-body">
+            <span class="me-3"><i class="fa-solid fa-rotate"></i>&nbsp;{{ 'refresh' | trans }}</span>
+        </a>
+        
     </div> 
     <div id="table_user"></div>
     {{ sg_datatables_render(datatable) }}
@@ -26,7 +31,7 @@
 $(document).ready(function(){
 
     var oTable = $('#sg-datatables-user_datatable').dataTable();
-    $.fn.DataTable.ext.pager.numbers_length = 4;
+    $.fn.DataTable.ext.pager.numbers_length = 5;
 
     $('#sg-datatables-user_datatable_wrapper .bottom').addClass('row');
     $('#sg-datatables-user_datatable_wrapper .bottom>div').addClass('col-6');

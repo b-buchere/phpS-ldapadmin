@@ -2,7 +2,7 @@
 
 {% block body %}
 
-<h1>{{ title|trans }}</h1>
+<h1 class="border-bottom border-dark border-2 py-2">{{ title|trans }}</h1>
 
 {# Affiche tous les messages flash #}
 {% for type, messages in app.flashes %}

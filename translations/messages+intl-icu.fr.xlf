@@ -432,7 +432,7 @@
       </trans-unit>
       <trans-unit id="1swKCIw" resname="refresh">
         <source>refresh</source>
-        <target state="translated">actualiser</target>
+        <target state="translated">Actualiser</target>
       </trans-unit>
       <trans-unit id="aW42MQT" resname="editUser">
         <source>editUser</source>

@@ -10,15 +10,17 @@
 
     
     <div class="pb-2">
-        <a class="text-decoration-none text-body" href="{{ path('ldapadmin_groupcreate') }}">
-            <span class="me-3">
-              <span id="add_group" class="fa-stack small">
-                <i class="fa-solid fa-users fa-stack-2x"></i>
-                <i class="fa-solid fa-plus fa-stack-1x"></i>
-              </span>
-              {{ 'groupCreate'|trans }}
-           </span>
-        </a>
+        {% if is_granted('create', user) %}
+            <a class="text-decoration-none text-body" href="{{ path('ldapadmin_groupcreate') }}">
+                <span class="me-3">
+                  <span id="add_group" class="fa-stack small">
+                    <i class="fa-solid fa-users fa-stack-2x"></i>
+                    <i class="fa-solid fa-plus fa-stack-1x"></i>
+                  </span>
+                  {{ 'groupCreate'|trans }}
+               </span>
+            </a>
+        {% endif %}
     </div> 
     <div id="table_user"></div>
     {{ sg_datatables_render(datatable) }}

@@ -7,6 +7,7 @@ use Sg\DatatablesBundle\Datatable\Column\ActionColumn;
 use Sg\DatatablesBundle\Datatable\Column\BooleanColumn;
 use Sg\DatatablesBundle\Datatable\Column\Column;
 use Sg\DatatablesBundle\Datatable\Filter\SelectFilter;
+use Symfony\Component\Security\Core\Security;
 use App\Services\BaseDatatable;
 use App\Entity\Groupes;
 /**
@@ -52,6 +53,28 @@ class UserDatatable extends BaseDatatable
      */
     public function buildDatatable(array $options = array())
     {
+        
+        $actions = [
+            [
+                'label' => ' ',
+                'icon'  => '',
+            ]
+            
+        ];
+        
+        if( $this->security->isGranted('create')){
+            $actions[0] = ['route' => 'ldapadmin_useredit',
+            'label' => '',
+            'icon'  => 'fas fa-edit',
+            'route_parameters' => [
+                'id' => 'id'
+            ],
+            'attributes' => [
+                'rel' => 'tooltip',
+                'title' => 'Modifier',
+                'role' => 'button'
+            ] ];
+        }
         
         $this->ajax->setMethod("POST");
         $this->ajax->setUrl($options['ajaxUrl']);
@@ -115,20 +138,7 @@ class UserDatatable extends BaseDatatable
                 'title' => 'Actions',
                 'start_html' => '<div class="btn-group w-100" role="group" aria-label="actions">',
                 'end_html' => '</div>',
-                'actions' => [
-                    [
-                        'route' => 'ldapadmin_useredit',
-                        'label' => '',
-                        'icon'  => 'fas fa-edit',
-                        'route_parameters' => [
-                            'id' => 'id'
-                        ],
-                        'attributes' => [
-                            'rel' => 'tooltip',
-                            'title' => 'Modifier',
-                            'role' => 'button'
-                        ]
-                    ]/*,
+                'actions' => $actions,/*,
                     [
                         'route' => 'admin_product_delete',
                         'label' => '',
@@ -143,62 +153,8 @@ class UserDatatable extends BaseDatatable
                             'role' => 'button'
                         ]
                     ]*/
-                ]
+                //]
             ));
-            /*->add(null, ActionColumn::class, array(
-                'title' => 'Actions',
-                'start_html' => '<div class="btn-group w-100" role="group" aria-label="actions">',
-                'end_html' => '</div>',
-                'actions' => [
-                    [
-                        'route' => 'admin_product_edit',
-                        'label' => '',
-                        'icon'  => 'fas fa-edit',
-                        'route_parameters' => [
-                            'id' => 'id'
-                        ],
-                        'attributes' => [
-                            'rel' => 'tooltip',
-                            'title' => 'Modifier',
-                            'class' => 'btn btn-primary btn-xs',
-                            'role' => 'button'
-                        ]
-                    ],
-                    [
-                        'route' => 'admin_product_delete',
-                        'label' => '',
-                        'icon'  => 'fas fa-trash',
-                        'route_parameters' => [
-                            'id' => 'id',
-                        ],
-                        'attributes' => [
-                            'rel' => 'tooltip',
-                            'title' => 'Supprimer',
-                            'class' => 'btn btn-danger btn-xs',
-                            'role' => 'button'
-                        ]
-                    ],
-                    [
-                        'route' => 'admin_product_edit',
-                        'label' => '',
-                        'icon'  => 'fas fa-cubes',
-                        'route_parameters' => [
-                            'id' => 'id',
-                            '_fragment' => 'variants'
-                        ],
-                        'attributes' => [
-                            'rel' => 'tooltip',
-                            'title' => 'Liste des variantes',
-                            'class' => 'btn btn-primary btn-xs',
-                            'role' => 'button'
-                        ],
-                        'render_if'=>function (Array $formattedRow) {
-                            
-                            return $formattedRow['variantCount']>1;
-                        }
-                    ]
-                ]
-            ));*/
         
             $this->language->set(array(
                 'language_by_locale' => true

@@ -136,7 +136,7 @@ class LdapUserCreateType extends AbstractType
                         'class'=>'form-control',
                     ],
                     'row_attr'=>[
-                        'class'=>"col-6"
+                        'class'=>"col-6 mb-4"
                     ],
                 ]
             )->add(
@@ -150,7 +150,7 @@ class LdapUserCreateType extends AbstractType
                         'class'=>'form-control',
                     ],
                     'row_attr'=>[
-                        'class'=>"col-6"
+                        'class'=>"col-6 mb-4"
                     ],
                 ]
             )->add(
@@ -164,7 +164,7 @@ class LdapUserCreateType extends AbstractType
                         "readonly"=>"readonly"
                     ],
                     'row_attr'=>[
-                        'class'=>"col-6"
+                        'class'=>"col-6 mb-4"
                     ],
                 ]
             )->add(
@@ -177,7 +177,7 @@ class LdapUserCreateType extends AbstractType
                         'class'=>'form-control'
                     ],
                     'row_attr'=>[
-                        'class'=>"col-6"
+                        'class'=>"col-6 mb-3"
                     ],
                 ]
             )->add(
@@ -209,7 +209,7 @@ class LdapUserCreateType extends AbstractType
                         'class'=>'form-select'
                     ],
                     'row_attr'=>[
-                        'class'=>"col-6"
+                        'class'=>"col-6 mb-3"
                     ],
                 ]
             )->add(
@@ -224,7 +224,7 @@ class LdapUserCreateType extends AbstractType
                         return $gr->findAllForDatatable();
                     },
                     'attr'=>[
-                        'class'=>"border border-dark rounded p-2 w-50 mb-2"
+                        'class'=>"border border-dark rounded p-2 w-75 mb-2"
                     ]
                 ]
             )->add(

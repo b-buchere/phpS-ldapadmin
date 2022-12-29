@@ -1,8 +1,10 @@
 {% extends 'ldap/admin/ldapadmin.base.html.twig' %}  
 
 {% block body %}
-<h1>{{ title|trans }}</h1>
+<div class="container col-8">
+<h1 class="border-bottom border-dark border-2 py-2">{{ title|trans }}</h1>
 
 <p class="callout callout-warning p-1">{% trans %}groupCreate.warning{% endtrans %}</p>
 {{ form(form) }}
+</div>
 {% endblock %}

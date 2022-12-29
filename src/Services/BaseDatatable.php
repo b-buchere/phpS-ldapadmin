@@ -13,6 +13,7 @@ use Sg\DatatablesBundle\Datatable\Options;
 use Sg\DatatablesBundle\Datatable\Column\ColumnBuilder;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
@@ -37,7 +38,8 @@ class BaseDatatable extends AbstractDatatable
         TranslatorInterface $translator,
         RouterInterface $router,
         EntityManagerInterface $em,
-        Environment $twig
+        Environment $twig,
+        Security $security
         ) {
             $this->validateName();
             
@@ -68,6 +70,7 @@ class BaseDatatable extends AbstractDatatable
             $this->events = new Events();
             $this->extensions = new Extensions();
             $this->language = new Language();
+            $this->security = $security;
             
             $this->accessor = PropertyAccess::createPropertyAccessor();
     }
