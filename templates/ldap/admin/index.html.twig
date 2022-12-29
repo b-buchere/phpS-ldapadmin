@@ -6,35 +6,6 @@ Lister les d�tails
 
 {% block body %}
 
-        {% if is_granted('create', user) %}
-        {% endif %}
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_groupcreate') }}">
-            Créer des groupes
-        </button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_userbulk') }}">
-            Import d'utilisateur par fichier
-        </button>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#asyncModal" data-href="{{ path('ldapadmin_usergroupupdate') }}">
-            Mise à jour des groupes utilisateurs
-        </button>
-    <div class="position-relative">
-        <div id="tree" class="col-3">
-    
-        </div>
-        <div id="object_details" class="col-9">
-        </div>
 
-    </div>
-
-
-<div class="modal fade" id="asyncModal" tabindex="-1" aria-labelledby="asyncModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-body">
-        ...
-      </div>
-    </div>
-  </div>
-</div>
 
 {% endblock %}
