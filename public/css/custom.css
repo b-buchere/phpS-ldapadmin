@@ -145,10 +145,31 @@ font-size: 1em;
 .nav-link{
   padding-left:1.1rem
 }
+.ldapadmin-menu li{
+  width:100%
+}
 
-.active>.active_indicator{
-  border-left : 2px solid #f7a616; 
-  margin-right:0.5em
+.active_indicator{
+  /*border-left : 2px solid #f7a616; 
+  margin-right:0.5em;*/
+  flex: 0 0 24px;
+  align-items: center;
+  justify-content: center;
+}
+
+.active>.active_indicator:before{
+  opacity:1
+}
+
+.active_indicator:before{
+  content: " ";
+  position: absolute;
+  left: 12px;
+  width: 2px;
+  height: 13px;
+  background-color: #f7a616;
+  top: 5px;
+  opacity:0
 }
 
 #sg-datatables-user_datatable_wrapper .pagination li:not(.disabled)>a,
