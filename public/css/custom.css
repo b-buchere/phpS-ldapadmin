@@ -121,7 +121,8 @@ font-size: 1em;
 }
 
 #ldap_getinfo input:focus{
-  box-shadow: none
+  box-shadow: none;
+  border-color:white
 }
 
 #ldap_getinfo > .input-group > .input-group-text{
@@ -185,7 +186,8 @@ font-size: 1em;
 #sg-datatables-user_datatable_wrapper .pagination li.active:not(.disabled)>a,
 #sg-datatables-group_datatable_wrapper .pagination li.active:not(.disabled)>a{
   color:white;
-    background-color : #474644!important
+    background-color : #474644!important;
+    border-color:#474644!important
 }
 
 .form-control{

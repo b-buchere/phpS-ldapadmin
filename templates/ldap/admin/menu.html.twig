@@ -1,7 +1,7 @@
 <div class="col-2 p-0 py-2 d-flex flex-column flex-shrink-0 bg-ldapadmin-menu ldapadmin-menu">
     <ul class="nav nav-pills flex-column mb-auto">
         <li>
-            <button class="w-100 btn btn-toggle align-items-center rounded collapsed fs-5" data-bs-toggle="collapse" data-bs-target="#user-collapse" aria-expanded="false" aria-controls="user-collapse">
+            <button class="w-100 btn btn-toggle align-items-center rounded collapsed fs-5 position-relative" data-bs-toggle="collapse" data-bs-target="#user-collapse" aria-expanded="{% if activeMenu == "user_list" or  activeMenu == "user_create" %}true{% else %}false{% endif %}" aria-controls="user-collapse">
                 <i class="fa-regular fa-user"></i>&nbsp;Utilisateurs
             </button>
             <div id="user-collapse" class="collapse {% if activeMenu == "user_list" or  activeMenu == "user_create" %}show{% endif %}">
@@ -29,7 +29,7 @@
         </li>
         
         <li>
-            <button class="w-100 btn btn-toggle align-items-center rounded collapsed fs-5" data-bs-toggle="collapse" data-bs-target="#group-collapse" aria-expanded="true"><i class="fa-solid fa-users"></i>&nbsp;Groupe</button>
+            <button class="w-100 btn btn-toggle align-items-center rounded collapsed fs-5 position-relative" data-bs-toggle="collapse" data-bs-target="#group-collapse" aria-expanded="{% if activeMenu == "group_list" or  activeMenu == "group_create" %}true{% else %}false{% endif %}"><i class="fa-solid fa-users"></i>&nbsp;Groupe</button>
             <div id="group-collapse" class="collapse {% if activeMenu == "group_list" or  activeMenu == "group_create" %}show{% endif %}">
                 <ul class="nav d-block">
                     <li class="menu-item">
@@ -55,7 +55,7 @@
         </li>
         {% if is_granted('create', user) %}
         <li>
-            <button class="btn w-100 btn-toggle align-items-center rounded collapsed fs-5" data-bs-toggle="collapse" data-bs-target="#import-collapse" aria-expanded="true"><i class="fa-solid fa-list-check"></i>&nbsp;Importation</button>
+            <button class="btn w-100 btn-toggle align-items-center rounded collapsed fs-5 position-relative" data-bs-toggle="collapse" data-bs-target="#import-collapse" aria-expanded="{% if activeMenu == "user_import" or  activeMenu == "user_group_update" %}true{% else %}false{% endif %}"><i class="fa-solid fa-list-check"></i>&nbsp;Importation</button>
             <div id="import-collapse" class="collapse {% if activeMenu == "user_import" or  activeMenu == "user_group_update" %}show{% endif %}">
                 <ul class="nav d-block">
                     <li class="menu-item">

@@ -89,7 +89,7 @@ class UserDatatable extends BaseDatatable
             'order_cells_top' => true,
             //'global_search_type' => 'gt',
             'search_in_non_visible_columns' => false,
-            'dom' => '<"top">ft<"bottom"il>rp<"clear">',
+            'dom' => '<"top">t<"bottom"il>rp<"clear">',
         ));
         $this->columnBuilder
             ->add('id', Column::class, array(
