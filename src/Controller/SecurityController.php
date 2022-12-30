@@ -37,13 +37,14 @@ class SecurityController extends BaseController
     public function index(AuthenticationUtils $authenticationUtils): Response
     {
         $this->initHtmlHead();
+        $this->headerExt->headLink->appendStylesheet("/css/custom.css");
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         
         // last username entered by the user
         $lastUsername = $authenticationUtils->getLastUsername();
         
-        $form = $this->createForm(LoginType::class, null, []);
+        $form = $this->createForm(LoginType::class, null, ['attr'=>['class'=>'credentialForm']]);
         
         return $this->render('login/index.html.twig', [
             'form'          => $form->createView(),

@@ -116,6 +116,18 @@ font-size: 1em;
   background-color: #474644 !important
 }
 
+.btn-outline-dark.inverted{
+  color:white;
+  border-color: #474644 !important;
+  background-color: #474644 !important
+}
+
+.btn-outline-dark.inverted:hover{
+  color : #474644;
+  border-color: #474644 !important;
+  background-color: white !important
+}
+
 .bi.bi-fa{
   vertical-align: 0.125em!important
 }
@@ -190,7 +202,37 @@ font-size: 1em;
     border-color:#474644!important
 }
 
-.form-control{
+/*.form-control{
   line-height:1!important;
   padding: 0.275rem 0.75rem
+}*/
+
+/****
+* Credential Form
+****/
+.credentialForm input.form-control{
+  border-width:0px 0px 1px 0px;
+  padding:2px;
+  padding-bottom:3px;
 }
+
+.credentialForm label.col-form-label{
+  padding:2px
+}
+
+.credentialForm .text-danger{
+  padding:2px
+}
+
+.mt-6{
+  margin-top:6rem
+}
+
+.pt-6{
+  padding-top:6rem
+}
+
+
+
+
+

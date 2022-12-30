@@ -61,7 +61,7 @@
       </trans-unit>
       <trans-unit id="qr0aiUo" resname="Invalid credentials.">
         <source>Invalid credentials.</source>
-        <target>Identifiants invalides.</target>
+        <target state="translated">Mot de passe invalide.</target>
         <note priority="1">obsolete</note>
         <note priority="1">obsolete</note>
         <note priority="1">obsolete</note>
@@ -187,7 +187,7 @@
       </trans-unit>
       <trans-unit id="z3cOUZo" resname="Username could not be found.">
         <source>Username could not be found.</source>
-        <target>Le nom d'utilisateur n'a pas pu être trouvé.</target>
+        <target state="translated">L'utilisateur n'existe pas.</target>
         <note priority="1">obsolete</note>
         <note priority="1">obsolete</note>
         <note priority="1">obsolete</note>

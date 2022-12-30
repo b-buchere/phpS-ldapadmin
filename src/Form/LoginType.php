@@ -15,20 +15,20 @@ class LoginType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-
         $builder
             ->add(
                 '_username',
                 TextType::class,
                 [
                     'label'=>'user',
-                    'label_attr'=>['class'=>"visually-hidden"],
+                    'label_attr'=>[
+                        'class'=>'col-3 col-form-label'
+                    ],
                     'attr'=>[
                         'placeholder'=>'user',
-                        'class'=>'form-control',
                     ],
                     'row_attr'=>[
-                        'class'=>""
+                        'class'=>"row"
                     ]
                 ]
             )->add(
@@ -36,12 +36,16 @@ class LoginType extends AbstractType
                 PasswordType::class,
                 [
                     'label' => 'Password',
-                    'label_attr'=>['class'=>"visually-hidden"],
+                    'label_attr'=>[
+                        'class'=>'col-3 col-form-label'
+                    ],
                     'attr'=>[
                         'placeholder'=>'Password',
                         'class'=>'form-control'
                     ],
-                    'row_attr'=>array('class'=>"mt-2"),
+                    'row_attr'=>[
+                        'class'=>"row"                        
+                    ],
                 ]
             )->add(
                 'login',
@@ -51,7 +55,7 @@ class LoginType extends AbstractType
                         'class'=>""
                     ],
                     'attr'=>[
-                        "class"=>"btn btn-primary mb-3 col-12 mt-2"
+                        "class"=>"btn btn-outline-dark inverted col-12 p-0"
                     ]
                 ]
             );

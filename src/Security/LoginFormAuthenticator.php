@@ -39,6 +39,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 	
     public function __construct(UserProviderInterface $userProvider, UrlGeneratorInterface $urlGenerator, ParameterBagInterface $params, HttpUtils $httpUtils )
     {
+        dump($userProvider);
         $this->urlGenerator = $urlGenerator;
         $this->userProvider = $userProvider;
         $this->params = $params;
@@ -50,25 +51,25 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         $param = $this->params;
         $credentials = $request->request->get('login');
 
+        $server = $param->get('ldap_server');
+        $dn = $param->get('ad_base_dn');
+        $user_admin = $param->get('ad_passwordchanger_user');
+        $user_pwd = $param->get('ad_passwordchanger_pwd');
+        
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port'  => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd
+        ]);
+        
         $request->getSession()->set(Security::LAST_USERNAME, $credentials['_username']);
 
         $passwordCredentials = new PasswordCredentials($credentials['_password']);
         return new Passport(
             new UserBadge(implode(',',$credentials), [$this->userProvider, 'loadUserByIdentifier']),
-            new CustomCredentials(function($credentials, LdapUserFromLdapRecord $user) use ($param){
-
-                $server = $param->get('ldap_server');
-                $dn = $param->get('ad_base_dn');
-                $user_admin = $param->get('ad_passwordchanger_user');
-                $user_pwd = $param->get('ad_passwordchanger_pwd');
-                
-                $connection = new Connection([
-                    'hosts' => [$server],
-                    'port'  => 389,
-                    'base_dn' => $dn,
-                    'username' => $user_admin,
-                    'password' => $user_pwd
-                ]);
+            new CustomCredentials(function($credentials, LdapUserFromLdapRecord $user) use ($connection){
 
                 return $connection->auth()->attempt($user->getEntry()->getDn(), $credentials);
                 }, $credentials['_password']),

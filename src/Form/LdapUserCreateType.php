@@ -53,7 +53,7 @@ class LdapUserCreateType extends AbstractType
                     "required"=>true,
                     'attr'=>[
                         "placeholder"=>"structure",
-                        'class'=>'form-select'
+                        'class'=>'form-select form-select-sm'
                     ],
                     'row_attr'=>[
                         'class'=>"col-6"
@@ -99,7 +99,7 @@ class LdapUserCreateType extends AbstractType
                     "required"=>true,
                     'attr'=>[
                         "placeholder"=>"structure",
-                        'class'=>'form-select'
+                        'class'=>'form-select form-select-sm'
                     ],
                     'row_attr'=>[
                         'class'=>"col-6"
@@ -133,7 +133,7 @@ class LdapUserCreateType extends AbstractType
                     "required"=>true,
                     'attr'=>[
                         'placeholder'=>'nom',
-                        'class'=>'form-control',
+                        'class'=>'form-control form-control-sm',
                     ],
                     'row_attr'=>[
                         'class'=>"col-6 mb-4"
@@ -147,7 +147,7 @@ class LdapUserCreateType extends AbstractType
                     "required"=>true,
                     'attr'=>[
                         'placeholder'=>'prenom',
-                        'class'=>'form-control',
+                        'class'=>'form-control form-control-sm',
                     ],
                     'row_attr'=>[
                         'class'=>"col-6 mb-4"
@@ -160,7 +160,7 @@ class LdapUserCreateType extends AbstractType
                     'mapped'=>false,
                     'label'=>"fullname",
                     'attr'=>[
-                        'class'=>'form-control',
+                        'class'=>'form-control form-control-sm',
                         "readonly"=>"readonly"
                     ],
                     'row_attr'=>[
@@ -174,7 +174,7 @@ class LdapUserCreateType extends AbstractType
                     'label'=>"courriel",
                     'attr'=>[
                         "placeholder"=>"courriel",
-                        'class'=>'form-control'
+                        'class'=>'form-control form-control-sm'
                     ],
                     'row_attr'=>[
                         'class'=>"col-6 mb-3"
@@ -190,7 +190,7 @@ class LdapUserCreateType extends AbstractType
                     "required"=>true,
                     'attr'=>[
                         "placeholder"=>"structure",
-                        'class'=>'form-select'
+                        'class'=>'form-select form-select'
                     ],
                     'row_attr'=>[
                         'class'=>"col-6"
@@ -206,7 +206,7 @@ class LdapUserCreateType extends AbstractType
                     "required"=>true,
                     'attr'=>[
                         "placeholder"=>"region",
-                        'class'=>'form-select'
+                        'class'=>'form-select form-select-sm'
                     ],
                     'row_attr'=>[
                         'class'=>"col-6 mb-3"
