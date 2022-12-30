@@ -39,7 +39,6 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
 	
     public function __construct(UserProviderInterface $userProvider, UrlGeneratorInterface $urlGenerator, ParameterBagInterface $params, HttpUtils $httpUtils )
     {
-        dump($userProvider);
         $this->urlGenerator = $urlGenerator;
         $this->userProvider = $userProvider;
         $this->params = $params;

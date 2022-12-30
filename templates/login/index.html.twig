@@ -4,48 +4,62 @@
 
 {% block title %}Centre d'administration - Connexion{% endblock %}
 
+{% block head_style %}
+    <style>
+      body {
+
+          font-family: 'Roboto', sans-serif;
+
+      }
+     
+    </style>
+{% endblock %}
 {% block body %}
 
 
 <div class="row pt-6 mt-6">
     <div class="container col-6">
         <div>
-            <h1 style="font-size:3rem"><img src="/assets/images/icone_unml.svg" class="position-relative px-2" style="height: 40px;top: -2.5px"/>Centre d'administration</h1>
+            <h1 class="container mb-4" style="font-size:3rem"><img src="/assets/images/icone_unml.svg" class="position-relative px-2" style="height: 40px;top: -2.5px"/>Centre d'administration</h1>
             <div class="container">
             {{ form_start(form) }}
 
-                <div class="row mb-3">
+                <div class="row justify-content-center mb-3 position-relative">
                     {{ form_label(form._username) }}
                     <div class="col-5">
                         {{ form_widget(form._username) }}
                     </div>
-                    <p class="col-4 text-danger m-0">
                     {% if error and error.messageKey == "Username could not be found."%}
+                    <p class="col-4 text-danger m-0 position-absolute">
+                    
                         {{ error.messageKey|trans(error.messageData, 'security') }}
-                    {% endif %}
+                    
                     </p>
+                    {% endif %}
                 </div>
-                <div class="row mb-3">
+                <div class="row justify-content-center mb-3 position-relative">
                     {{ form_label(form._password) }}
                     <div class="col-5">
                         {{ form_widget(form._password) }}
                     </div>
-                    <p class="col-4 text-danger m-0">
+                    
                     {% if error and error.messageKey == "Invalid credentials."%}
+                    <p class="col-4 text-danger m-0">
                         {{ error.messageKey|trans(error.messageData, 'security') }}
-                    {% endif %}
                     </p>
+                    {% endif %}
+
                 </div>
 
-                            <div class="form-errors">
+            <div class="form-errors">
 
-            {% if error %}
-                <div>{{ error.messageKey|trans(error.messageData, 'security') }}
+            {% if error and error.messageKey not in ['Username could not be found.','Invalid credentials.']%}
+                <p class="text-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</p>
             {% endif %}</div>
             
-            <div class="row">
+            <div class="row justify-content-center">
                 <div class="col-6 p-0 fs-7 align-self-center">
-                    <a href="#" class="text-secondary">Votre compte n'est pas accessible ?</a>
+                    <a href="{{ path('password_changerequest') }}" class="text-secondary">Votre compte n'est pas accessible ?</a>
                 </div>
                 <div class="col-3">
                     {{ form_widget(form.login) }}

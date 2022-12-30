@@ -69,9 +69,7 @@ class LdapAdminController extends BaseController
         $this->headerExt->headLink->appendStylesheet("/css/sidebar.css");
         $this->headerExt->headLink->appendStylesheet("/css/all.min.css");
         $this->headerExt->headLink->appendStylesheet("/css/custom.css");
-        //$this->headerExt->headLink->appendStylesheet('/fontawesome/css/all.css');
-        //$this->headerExt->headLink->appendStylesheet('/css/global.css');
-        //$this->headerExt->headLink->appendStylesheet('https://fonts.googleapis.com/css2?family=Oswald:wght@200;300;400;500;600;700');
+
         
         $this->headerExt->headMeta->appendName('robots', 'noindex, nofollow');
     }

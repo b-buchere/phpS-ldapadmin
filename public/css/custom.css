@@ -224,6 +224,10 @@ font-size: 1em;
   padding:2px
 }
 
+.credentialForm[name="login"] .text-danger{
+  left: 85%
+}
+
 .mt-6{
   margin-top:6rem
 }

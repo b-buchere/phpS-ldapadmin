@@ -38,6 +38,9 @@ class SecurityController extends BaseController
     {
         $this->initHtmlHead();
         $this->headerExt->headLink->appendStylesheet("/css/custom.css");
+        $this->headerExt->headLink->appendStylesheet("https://fonts.googleapis.com", "", false, ['rel'=>"preconnect"]);
+        $this->headerExt->headLink->appendStylesheet("https://fonts.gstatic.com", "", false, ['rel'=>"preconnect", "crossorigin"=>"true"]);
+        $this->headerExt->headLink->appendStylesheet("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
         // get the login error if there is one
         $error = $authenticationUtils->getLastAuthenticationError();
         
