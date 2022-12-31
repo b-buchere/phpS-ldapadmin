@@ -36,16 +36,33 @@ class PasswordController extends BaseController
         $this->headerExt = $headerExt;
     }
     
+    //public
+    public function initHtmlHead(){
+        
+        parent::initHtmlHead();
+        $this->headerExt->setWebroot($this->getParameter('site_base_url'));
+        //$this->headerExt->headLink->appendAlternate("/favicon.ico", 'image/vnd.microsoft.icon', null, ['rel'=>"shortcut icon"] );
+        $this->headerExt->headScript->appendFile('https://code.jquery.com/jquery-3.6.0.min.js');
+        $this->headerExt->headScript->appendFile('https://code.jquery.com/ui/1.12.1/jquery-ui.min.js');
+        $this->headerExt->headScript->appendFile('/js/bootstrap.bundle.min.js');
+        
+        $this->headerExt->headLink->appendStylesheet("/css/bootstrap.min.css");
+        $this->headerExt->headMeta->appendName('robots', 'noindex, nofollow');
+    }
+    
     /**
      * @Route("/changerequest", name="changerequest")
      */
     public function index(Request $request): Response
     {       
         $this->initHtmlHead();
-        $this->headerExt->headLink->appendStylesheet("/css/reset.css");
+        $this->headerExt->headLink->appendStylesheet("/css/custom.css");
+        $this->headerExt->headLink->appendStylesheet("https://fonts.googleapis.com", "", false, ['rel'=>"preconnect"]);
+        $this->headerExt->headLink->appendStylesheet("https://fonts.gstatic.com", "", false, ['rel'=>"preconnect", "crossorigin"=>"true"]);
+        $this->headerExt->headLink->appendStylesheet("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
         
-        $form = $this->createForm(PasswordChangeRequestType::class, null);
-        
+        $form = $this->createForm(PasswordChangeRequestType::class, null, ['attr'=>['class'=>'credentialForm']]);
+        dump($form->createView());
         $form->handleRequest($request);
         $message = [];
         
@@ -69,48 +86,53 @@ class PasswordController extends BaseController
             //R�cup�ration des infos user par nom de compte
             $user_search = $ldap->query($dn, "(|(samaccountname=$user))");
             $user_get = $user_search->execute()->toArray();
-            $user_def = $user_get[0]->getAttributes();
             
-            $mailUser = $user_def["mail"][0];
-            //Create an instance; passing `true` enables exceptions
-            if(!is_null($mailUser) && !empty($mailUser)){
-                try {
-                    
-                    $urlchangePassword = "https://".$request->getHttpHost().$this->generateUrl('password_changeprompt').'?d=';
-                    $dataMail = [
-                        'user'=>$user,
-                        'time'=>time()
-                    ];
-                    $dataMailImplode = http_build_query($dataMail);
-                    $dataMailImplode = urlencode($dataMailImplode);
-                    $urlchangePassword .= base64_encode($dataMailImplode);
-                    $subject = 'Réintilisation de mot de passe';
-                    $body    = '<a href="'.$urlchangePassword.'">Réinitialiser le mot de passe</a>';
-                    
-                    $dsn = $this->getParameter('dsn');
-                    $transport = Transport::fromDsn($dsn);
-                    $mailer = new Mailer($transport);
-                    
-                    $mail = (new Email())
-                        ->from('ncunml@unml.info')
-                        ->to($mailUser)
-                        ->subject($subject)
-                        ->html($body, 'UTF-8');
-                    //$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
-                    
-                    if ( $mailer->send($mail) === false ){
-                        $message["error"] = ["La réinitialisation ou la modification du mot de passe est impossible"];
-                    } else {
-                        $message["success"] = ["Un message a été envoyé à votre adresse de courriel"];
+            if(!empty($user_get)){
+                $user_def = $user_get[0]->getAttributes();
+                
+                $mailUser = $user_def["mail"][0];
+                //Create an instance; passing `true` enables exceptions
+                if(!is_null($mailUser) && !empty($mailUser)){
+                    try {
+                        
+                        $urlchangePassword = "https://".$request->getHttpHost().$this->generateUrl('password_changeprompt').'?d=';
+                        $dataMail = [
+                            'user'=>$user,
+                            'time'=>time()
+                        ];
+                        $dataMailImplode = http_build_query($dataMail);
+                        $dataMailImplode = urlencode($dataMailImplode);
+                        $urlchangePassword .= base64_encode($dataMailImplode);
+                        $subject = 'Réintilisation de mot de passe';
+                        $body    = '<a href="'.$urlchangePassword.'">Réinitialiser le mot de passe</a>';
+                        
+                        $dsn = $this->getParameter('dsn');
+                        $transport = Transport::fromDsn($dsn);
+                        $mailer = new Mailer($transport);
+                        
+                        $mail = (new Email())
+                            ->from('ncunml@unml.info')
+                            ->to($mailUser)
+                            ->subject($subject)
+                            ->html($body, 'UTF-8');
+                        //$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+                        
+                        if ( $mailer->send($mail) === false ){
+                            $message["danger"] = ["resetPasswordNotSend"];
+                        } else {
+                            $message["success"] = ["resetPasswordSend"];
+                        }
+                    } catch (TransportExceptionInterface  $e) {
+    
+                        $message["danger"] = ["mailNotSend"];
                     }
-                } catch (TransportExceptionInterface  $e) {
-
-                    $message["error"] = ["Envoi de courriel impossible. Erreur du Mailer"];
                 }
+    
             }
-
+            else{
+                $message["danger"] = ["Username could not be found."];
+            }
         }
-        
         return $this->render('password/changerequest.html.twig', [
             'form'=>$form->createView(),
             'messages'=>$message,
@@ -125,14 +147,17 @@ class PasswordController extends BaseController
     public function prompt(Request $request): Response
     {
         $this->initHtmlHead();
-        $this->headerExt->headLink->appendStylesheet("/css/reset.css");
+        $this->headerExt->headLink->appendStylesheet("/css/custom.css");
+        $this->headerExt->headLink->appendStylesheet("https://fonts.googleapis.com", "", false, ['rel'=>"preconnect"]);
+        $this->headerExt->headLink->appendStylesheet("https://fonts.gstatic.com", "", false, ['rel'=>"preconnect", "crossorigin"=>"true"]);
+        $this->headerExt->headLink->appendStylesheet("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
         
         $dataDecoded = urldecode(base64_decode($request->query->get('d')) );
         $data =[];
         parse_str($dataDecoded, $data);
         $userData = $data['user'];
         
-        $form = $this->createForm(PasswordChangePromptType::class, null);
+        $form = $this->createForm(PasswordChangePromptType::class, null, ['attr'=>['class'=>'credentialForm']]);
         $form->get('User')->setData($userData);
         
         $form->handleRequest($request);
@@ -172,39 +197,38 @@ class PasswordController extends BaseController
             $message["error"] = [];
             // Règles de sécurité des mots de passe
             if ( $passwordRetryCount >= 3 ) {
-                $message["error"][] = "Votre compte est bloqué !";
+                $message["danger"][] = "Votre compte est bloqué !";
             }
             
             //Confirmation du nouveau mot de passe
             if ($newPassword != $dataForm['NewPasswordCnfm'] ) {
-                $message["error"][] = "La confirmation du mot de passe de correspond pas!";
+                $message["danger"][] = "La confirmation du mot de passe ne correspond pas!";
             }
-            
             
             //longueur du mot de passe
             if (strlen($newPassword) < 8 ) {
-                $message["error"][] = "Votre mot de passe est trop court.<br/>Le mot de passe doit faire au moins 8 caractères.";
+                $message["danger"][] = "Votre mot de passe est trop court.<br/>Le mot de passe doit faire au moins 8 caractères.";
             }
             //chiffre nécessaire
             if (!preg_match("/[0-9]/",$newPassword)) {
-                $message["error"][] = "Le mot de passe doit contenir au moins un chiffre.";
+                $message["danger"][] = "Le mot de passe doit contenir au moins un chiffre.";
             }
             //Lettre nécessaire
             if (!preg_match("/[a-zA-Z]/",$newPassword)) {
-                $message["error"][] = "Error E105 - Le mot de passe doit contenir au moins une lettre.";
+                $message["danger"][] = "Error E105 - Le mot de passe doit contenir au moins une lettre.";
             }
             //Majuscule nécessaire
             if (!preg_match("/[A-Z]/",$newPassword)) {
-                $message["error"][] = "Le mot de passe doit contenir au moins une majuscule.";
+                $message["danger"][] = "Le mot de passe doit contenir au moins une majuscule.";
             }
             
             //Pb de compte (différent d'un verrouilage de compte)
             if (is_null($user) ) {
-                $message["error"][] = "Connexion au serveur impossible, merci de réessayé ultérieurement.";
+                $message["danger"][] = "Connexion au serveur impossible, merci de réessayé ultérieurement.";
             }
             
             
-            if ( empty($message["error"]) ){
+            if ( empty($message["danger"]) ){
                 try{
                     $user->unicodepwd = $newPassword;
                     $user->save();
@@ -224,7 +248,7 @@ class PasswordController extends BaseController
                     
                     $errno = $error->getErrorCode();
                     
-                    $message["error"] = [
+                    $message["danger"] = [
                         "impossible de changer le mot de passe, veuillez contacter l'administrateur.",
                         $errno." - ".$error->getDiagnosticMessage(),
                         $error->getErrorMessage()
@@ -235,7 +259,7 @@ class PasswordController extends BaseController
             }
         }
         
-        return $this->render('password/changerequest.html.twig', [
+        return $this->render('password/prompt.html.twig', [
             'form'=>$form->createView(),
             'messages'=>$message,
             'helpHtml'=>'password/prompt.html.twig'

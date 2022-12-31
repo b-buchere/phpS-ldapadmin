@@ -212,6 +212,7 @@ font-size: 1em;
 ****/
 .credentialForm input.form-control{
   border-width:0px 0px 1px 0px;
+  border-radius:0px;
   padding:2px;
   padding-bottom:3px;
 }
@@ -224,8 +225,13 @@ font-size: 1em;
   padding:2px
 }
 
-.credentialForm[name="login"] .text-danger{
+.credentialForm[name="login"] .text-danger
+{
   left: 85%
+}
+
+#changeRequestLoginError{
+  left:70%
 }
 
 .mt-6{

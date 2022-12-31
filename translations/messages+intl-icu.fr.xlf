@@ -309,16 +309,16 @@
         <note priority="1">sambaldap\src\Form\LoginType.php:19</note>
         <note priority="1">obsolete</note>
       </trans-unit>
-      <trans-unit id="pbSAYgl" resname="New password cnfm">
-        <source>New password cnfm</source>
-        <target/>
+      <trans-unit id="8WFd8pW" resname="newPasswordCnfm">
+        <source>newPasswordCnfm</source>
+        <target state="translated">Confirmer le mot de passe</target>
         <note priority="1">sambaldap\src\Form\PasswordChangePromptType.php:17</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
-      <trans-unit id="PdnfREH" resname="New password">
-        <source>New password</source>
-        <target/>
+      <trans-unit id="XCmpWav" resname="newPassword">
+        <source>newPassword</source>
+        <target state="translated">Nouveau mot de passe</target>
         <note priority="1">sambaldap\src\Form\PasswordChangePromptType.php:17</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -469,6 +469,22 @@
       <trans-unit id="nXhTNaO" resname="userCountNotUpdated">
         <source>userCountNotUpdated</source>
         <target state="translated">Nombre d'utilisateurs non groupés : {nombre}</target>
+      </trans-unit>
+      <trans-unit id="J84dG.Q" resname="send">
+        <source>send</source>
+        <target state="translated">Envoyer</target>
+      </trans-unit>
+      <trans-unit id="xT7Y9fk" resname="resetPasswordNotSend">
+        <source>resetPasswordNotSend</source>
+        <target state="translated">La réinitialisation ou la modification du mot de passe est impossible</target>
+      </trans-unit>
+      <trans-unit id="17IH595" resname="resetPasswordSend">
+        <source>resetPasswordSend</source>
+        <target state="translated">Un message a été envoyé à votre adresse de courriel</target>
+      </trans-unit>
+      <trans-unit id="az1Mpi1" resname="mailNotSend">
+        <source>mailNotSend</source>
+        <target state="translated">Envoi de courriel impossible. Erreur du Mailer</target>
       </trans-unit>
     </body>
   </file>

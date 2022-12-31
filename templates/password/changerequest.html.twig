@@ -1,46 +1,74 @@
 {% extends 'base.html.twig' %}  
 
-{% form_theme form 'form_theme/passwordchanger.html.twig' %}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
 
-{% block title %}
-Demande de changement de mot de passe
+{% block title %}Centre d'administration - Demande de changement de mot de passe{% endblock %}
+
+{% block head_style %}
+    <style>
+      body {
+
+          font-family: 'Roboto', sans-serif;
+
+      }
+     
+    </style>
 {% endblock %}
-
 {% block body %}
 
-<div id="body-login">
-    <div class="wrapper">
-        <div class="v-align">
-            <header role="banner">
-                <div id="header">
-                    <div class="logo">
-
-                    </div>
-                </div>
-            </header>
-            <h2 class="hidden-visually">Demande de changement de mot de passe</h2>
-            <main>
-                <div>      
-                    <div class="login-additional">          
-                        <div class="lost-password-container">
-                            {% include helpHtml %} 
-                            {{ form(form) }}
+<div class="row pt-6 mt-6">
+    <div class="container col-6">
+        <div>
+            <h1 class="mb-4" style="font-size:3rem"><img src="/assets/images/icone_unml.svg" class="position-relative px-2" style="height: 40px;top: -2.5px"/>Réinitialisez votre mot de passe</h1>
+            <div class="px-4">
+                <ol>
+                    <li>Entrez votre nom d'utilisateur (ex: Clémence Dupont = cdupont)</li>
+                    <li>Cliquez sur le bouton <strong>Envoyer</strong></li>
+                    <li>Consultez votre messagerie et cliquez sur le lien.</li>
+                </ol>
+                <div class="container">
+                    {{ form_start(form) }}
+        
+                    <div class="row mb-3 position-relative">
+                        {{ form_label(form.User) }}
+                        <div class="col-5">
+                            {{ form_widget(form.User) }}
                         </div>
-                        {% if form.vars.submitted %}                
-                            {% for type, messageType in messages %}
-                            <div class="update {{ type }}">
-                                {% for message in messageType %}
-                                    <p>{{ message }}</p>
-                                {% endfor %}
-                            </div>
-                            {% endfor %}
+                        {% if messages %}
+                        {% set error = messages.danger %}
+                        {% if error and "Username could not be found." in error %}
+                        <p class="col-4 text-danger m-0 position-absolute" id="changeRequestLoginError">
+                        
+                            {{ "Username could not be found."|trans(error, 'security') }}
+                        
+                        </p>
+                        {% set messages = messages|merge({danger: error | filter((v, k) => v != 'Username could not be found.') }) %}
+                        {% endif %}
+                        
                         {% endif %}
                     </div>
+        
+                    {% if form.vars.submitted %}                
+                        {% for type, messageType in messages %}
+                        {% if messageType %}
+                        <div class="update text-{{ type }}">
+                            {% for message in messageType %}
+                                <p>{{ message|trans }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    <div class="row justify-content-center">
+                        <div class="col-3">
+                            {{ form_widget(form.submit) }}
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
                 </div>
-
-            </main>
+            </div>
         </div>
     </div>
-</div>
 
+</div>
 {% endblock %}

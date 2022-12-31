@@ -1,8 +1,77 @@
-                                <div>
-                                    Le nouveau mot de passe <strong>doit comprendre</strong> 8 caractères minimum et respecter les caractéristiques suivantes :
-                                    <ul>
-                                        <li><i>une majuscule minimum</i></li>
-                                        <li><i>un chiffre minimum</i></li>
-                                    </ul>
-                                    Le nouveau mot de passe ne <strong>doit pas </strong>être un mot de passe récent.
-                                </div>
+                               
+{% extends 'base.html.twig' %}  
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}Centre d'administration - Modificaiton du mot de passe{% endblock %}
+
+{% block head_style %}
+    <style>
+      body {
+
+          font-family: 'Roboto', sans-serif;
+
+      }
+     
+    </style>
+{% endblock %}
+{% block body %}
+
+<div class="row pt-6 mt-6">
+    <div class="container col-6">
+        <div>
+            <h1 class="mb-4" style="font-size:3rem"><img src="/assets/images/icone_unml.svg" class="position-relative px-2" style="height: 40px;top: -2.5px"/>Réinitialisez votre mot de passe</h1>
+            <div class="px-4">
+                <div>
+                    Le nouveau mot de passe <strong>doit</strong> respecter les caractéristiques suivantes :
+                    <ul>
+                        <li><i>8 caractères minimum</i></li>
+                        <li><i>une majuscule minimum</i></li>
+                        <li><i>un chiffre minimum</i></li>
+                    </ul>
+                    Le nouveau mot de passe ne <strong>doit pas </strong>être un mot de passe récent.
+                </div>
+                <div class="container">
+                    {{ form_start(form) }}
+
+                        {{ form_row(form.User) }}
+
+                    <div class="row justify-content-center mb-3 position-relative">
+                        {{ form_label(form.NewPassword) }}
+                        <div class="col-5">
+                            {{ form_widget(form.NewPassword) }}
+                        </div>
+
+                    </div>
+                    <div class="row justify-content-center mb-3 position-relative">
+                        {{ form_label(form.NewPasswordCnfm) }}
+                        <div class="col-5">
+                            {{ form_widget(form.NewPasswordCnfm) }}
+                        </div>
+
+                    </div>
+        
+                    {% if form.vars.submitted %}                
+                        {% for type, messageType in messages %}
+                        {% if messageType %}
+                        <div class="update text-{{ type }}">
+                            {% for message in messageType %}
+                                <p>{{ message|trans }}</p>
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+                        {% endfor %}
+                    {% endif %}
+                    <div class="row justify-content-center">
+                        <div class="col-3">
+                            {{ form_widget(form.submit) }}
+                        </div>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

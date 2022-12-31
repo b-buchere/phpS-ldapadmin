@@ -4,6 +4,7 @@ namespace App\Form;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,13 +18,29 @@ class PasswordChangeRequestType extends AbstractType
                 'User',
                 TextType::class,
                 [
-                    'label'=>'Adresse email',
-                    'label_attr'=>['class'=>"hidden-visually"],
+                    'label'=>'user',
+                    'label_attr'=>['class'=>"col-3 col-form-label"],
                     'attr'=>[
-                        'placeholder'=>'user'
+                        'placeholder'=>'user',
+                        'class'=>"form-control form-control-sm"
+                    ],
+                    'row_attr'=>[
+                        'class'=>"row"
                     ]
                 ]
-            );
+                )->add(
+                    'submit',
+                    SubmitType::class,
+                    [
+                        'label'=>"send",
+                        'row_attr'=>[
+                            'class'=>""
+                        ],
+                        'attr'=>[
+                            "class"=>"btn btn-outline-dark inverted col-12 p-0"
+                        ]
+                    ]
+                );
     }
 
     public function configureOptions(OptionsResolver $resolver): void

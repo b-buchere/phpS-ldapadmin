@@ -5,6 +5,7 @@ namespace App\Form;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
@@ -22,17 +23,41 @@ class PasswordChangePromptType extends AbstractType
                 'NewPassword',
                 PasswordType::class,
                 [
-                    'label_attr'=>['class'=>"hidden-visually"],
+                    'label' => "newPassword",
+                    'label_attr'=>['class'=>"col-4 col-form-label"],
+                    'attr'=>[
+                        'placeholder'=>'newPassword',
+                        'class'=>"form-control form-control-sm"
+                        
+                    ],
                     'row_attr'=>array('class'=>"grouptop"),
                 ]
             )->add(
                 'NewPasswordCnfm',
                 PasswordType::class,
                 [
-                    'label_attr'=>['class'=>"hidden-visually"],
+                    'label' => "newPasswordCnfm",
+                    'label_attr'=>['class'=>"col-4 col-form-label"],
+                    'attr'=>[
+                        'placeholder'=>'newPasswordCnfm',
+                        'class'=>"form-control form-control-sm"
+                        
+                    ],
                     'row_attr'=>array('class'=>"groupbottom"),
                 ]
-            );
+            )->add(
+                'submit',
+                SubmitType::class,
+                [
+                    'label'=>"send",
+                    'row_attr'=>[
+                        'class'=>""
+                    ],
+                    'attr'=>[
+                        "class"=>"btn btn-outline-dark inverted col-12 p-0"
+                    ]
+                ]
+                );
     }
 
     public function configureOptions(OptionsResolver $resolver): void
