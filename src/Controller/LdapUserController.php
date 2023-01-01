@@ -566,8 +566,15 @@ class LdapUserController extends BaseController
 
         $form->handleRequest($request);
         
-        if ($form->isSubmitted() && $form->isValid()) {
+        if ($form->isSubmitted() ){
+            if($form->get('cancel')->isClicked()){
+                
+                return $this->redirectToRoute('ldapadmin_userlist');
+            }
+            
+            if($form->isValid()) {
             $data = $form->getData();
+
             $groupeFormData = $form->get('Groupes')->getData();
             $utilphp = new util();
             
@@ -617,7 +624,7 @@ class LdapUserController extends BaseController
             }
 
         }
-        
+        }
         return $this->render('ldap/admin/usercreate.html.twig', [
             'user'=>$this->getUser(),
             'form'=>$form->createView(),
@@ -685,61 +692,68 @@ class LdapUserController extends BaseController
         
         $form->handleRequest($request);
         
-        if ($form->isSubmitted() && $form->isValid()) {
-            $utilphp = new util();
-            
-            $user = User::findBy('samaccountname', strtolower($form->get('prenom')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('nom')->getData())));            
-
-            if(is_null($user)){
-                $user = (new User)->inside($form->get('structure')->getData());
-                $user->unicodePwd = '';
-                $user->samaccountname = ucfirst(strtolower($form->get('prenom')->getData()[0])).strtolower($utilphp->sanitize_string($form->get('nom')->getData()));
-                $user->userAccountControl = 512;
-                $user->pwdlastset = 0;
+        if ($form->isSubmitted() ){
+            if($form->get('cancel')->isClicked()){
+                
+                return $this->redirectToRoute('ldapadmin_userlist');
             }
-
-            $user->mail = $form->get('courriel')->getData();
+        
+            if($form->isValid()) {
             
-            try {
+                $utilphp = new util();
+    
+                $user = User::findBy('samaccountname', strtolower($form->get('prenom')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('nom')->getData())));            
+    
+                if(is_null($user)){
+                    $user = (new User)->inside($form->get('structure')->getData());
+                    $user->unicodePwd = '';
+                    $user->samaccountname = ucfirst(strtolower($form->get('prenom')->getData()[0])).strtolower($utilphp->sanitize_string($form->get('nom')->getData()));
+                    $user->userAccountControl = 512;
+                    $user->pwdlastset = 0;
+                }
+    
+                $user->mail = $form->get('courriel')->getData();
                 
-                $groupeFormData = $form->get('Groupes')->getData();
-
-                $user->save();
-                
-                $user->groups()->detachAll();
-                
-                $userDb->setDn($user->getDn());
-                $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
-                $userDb->setNom($user->getAttribute('sn')[0]);
-                //$userDb->setCourriel($user->getAttribute('mail'));
-                
-                $this->em->persist($userDb);
-                
-                foreach( $groupeFormData as $groupe ){
-                    /**
-                     * @var Groupes $groupe
-                     */
-                    //$groupeDb = $this->em->getRepository(Groupes::class)->findOneById((int)$groupe);
+                try {
                     
-                    $groupe->addMembre($userDb);
-                    $this->em->persist($groupe);
+                    $groupeFormData = $form->get('Groupes')->getData();
+    
+                    $user->save();
+                    
+                    $user->groups()->detachAll();
+                    
+                    $userDb->setDn($user->getDn());
+                    $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
+                    $userDb->setNom($form->get('nom')->getData());
+                    //$userDb->setCourriel($user->getAttribute('mail'));
+                    
+                    $this->em->persist($userDb);
+                    
+                    foreach( $groupeFormData as $groupe ){
+                        /**
+                         * @var Groupes $groupe
+                         */
+                        //$groupeDb = $this->em->getRepository(Groupes::class)->findOneById((int)$groupe);
                         
-                    $ldadGroupe = Group::find($groupe->getDn());
+                        $groupe->addMembre($userDb);
+                        $this->em->persist($groupe);
+                            
+                        $ldadGroupe = Group::find($groupe->getDn());
+                        
+                        $user->groups()->attach($ldadGroupe);
+                        
+                    }                  
+    
+                    $this->em->persist($userDb);
+                    $this->em->flush();
                     
-                    $user->groups()->attach($ldadGroupe);
-                    
-                }                  
-
-                $this->em->persist($userDb);
-                $this->em->flush();
-                
-                $this->addFlash("success", "userModified");
-            } catch (\LdapRecord\LdapRecordException $e) {
-                // Failed saving user.
-                //dump($e);
+                    $this->addFlash("success", "userModified");
+                } catch (\LdapRecord\LdapRecordException $e) {
+                    // Failed saving user.
+                    //dump($e);
+                }
             }
         }
-        
         return $this->render('ldap/admin/usercreate.html.twig', [
             'user'=>$this->getUser(),
             'form'=>$form->createView(),
@@ -805,7 +819,85 @@ class LdapUserController extends BaseController
      */
     public function resetpwd(int $id, Request $request): Response
     {
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
         
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true,
+            'follow_referrals' => false,
+            'version'  => 3,
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
+        
+        $query = $connection->query();
+        
+        /**
+         * @var Utilisateurs $userDb
+         */
+        $userDb = $this->em->getRepository(Utilisateurs::class)->findOneById($id);      
+        
+        $user = User::findBy('samaccountname', strtolower($userDb->getIdentifiant()));        
+        
+        if(!empty($user)){
+            $user->userAccountControl = 512;
+            $user->pwdlastset = 0;
+            
+            $user->save();
+            
+            $user_def = $user->getAttributes();
+            
+            $mailUser = $user_def["mail"][0];
+            //Create an instance; passing `true` enables exceptions
+            if(!is_null($mailUser) && !empty($mailUser)){
+                try {
+                    
+                    $urlchangePassword = "https://".$request->getHttpHost().$this->generateUrl('password_changeprompt').'?d=';
+                    $dataMail = [
+                        'user'=>$userDb->getIdentifiant(),
+                        'time'=>time()
+                    ];
+                    $dataMailImplode = http_build_query($dataMail);
+                    $dataMailImplode = urlencode($dataMailImplode);
+                    $urlchangePassword .= base64_encode($dataMailImplode);
+                    $subject = 'Réintilisation de mot de passe';
+                    $body    = '<a href="'.$urlchangePassword.'">Réinitialiser le mot de passe</a>';
+                    
+                    $dsn = $this->getParameter('dsn');
+                    $transport = Transport::fromDsn($dsn);
+                    $mailer = new Mailer($transport);
+                    
+                    $mail = (new Email())
+                    ->from('ncunml@unml.info')
+                    ->to($mailUser)
+                    ->subject($subject)
+                    ->html($body, 'UTF-8');
+                    //$mail->AltBody = 'This is the body in plain text for non-HTML mail clients';
+                    
+                    if ( $mailer->send($mail) === false ){
+                        $this->addFlash("danger", "resetPasswordNotSend");
+                    } else {
+                        $this->addFlash("success", "userPwdReseted");
+                    }
+                } catch (TransportExceptionInterface  $e) {
+                    
+                    $this->addFlash("danger", "mailNotSend");
+                }
+            }
+            
+        }
+        
+        return $this->redirectToRoute('ldapadmin_useredit', ['id'=>$id]);
     }
     
     /**

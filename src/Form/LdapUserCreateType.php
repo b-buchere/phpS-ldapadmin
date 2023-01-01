@@ -7,6 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Form\Extension\Core\Type\ButtonType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -22,6 +23,12 @@ use App\Repository\GroupesRepository;
 
 class LdapUserCreateType extends AbstractType
 {
+    private $router;
+    
+    public function __construct(UrlGeneratorInterface $router){
+        $this->router = $router;
+    }
+    
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
@@ -247,7 +254,9 @@ class LdapUserCreateType extends AbstractType
                         'class'=>"col-3"
                     ],
                     'attr'=>[
-                        "class"=>"btn btn-outline-dark mb-3 col-12"
+                        "class"=>"btn btn-outline-dark mb-3 col-12",
+                        "type"=>"button",
+                        'onclick'=>'window.location.href="'.$this->router->generate("ldapadmin_userlist").'"' 
                     ]
                 ]
             );

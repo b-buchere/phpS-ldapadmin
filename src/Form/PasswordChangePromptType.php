@@ -27,17 +27,14 @@ class PasswordChangePromptType extends AbstractType
                     'label_attr'=>['class'=>"col-4 col-form-label"],
                     'attr'=>[
                         'placeholder'=>'newPassword',
-                        'class'=>"form-control form-control-sm"
-                        
-                    ],
-                    'row_attr'=>array('class'=>"grouptop"),
+                        'class'=>"form-control form-control-sm"                        
+                    ]
                 ]
             )->add(
                 'NewPasswordCnfm',
                 PasswordType::class,
                 [
                     'label' => "newPasswordCnfm",
-                    'label_attr'=>['class'=>"col-4 col-form-label"],
                     'attr'=>[
                         'placeholder'=>'newPasswordCnfm',
                         'class'=>"form-control form-control-sm"

@@ -62,7 +62,7 @@ class PasswordController extends BaseController
         $this->headerExt->headLink->appendStylesheet("https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap");
         
         $form = $this->createForm(PasswordChangeRequestType::class, null, ['attr'=>['class'=>'credentialForm']]);
-        dump($form->createView());
+
         $form->handleRequest($request);
         $message = [];
         
@@ -133,6 +133,8 @@ class PasswordController extends BaseController
                 $message["danger"] = ["Username could not be found."];
             }
         }
+        
+        
         return $this->render('password/changerequest.html.twig', [
             'form'=>$form->createView(),
             'messages'=>$message,
@@ -156,8 +158,10 @@ class PasswordController extends BaseController
         $data =[];
         parse_str($dataDecoded, $data);
         $userData = $data['user'];
+        dump($userData);
         
         $form = $this->createForm(PasswordChangePromptType::class, null, ['attr'=>['class'=>'credentialForm']]);
+        dump($form);
         $form->get('User')->setData($userData);
         
         $form->handleRequest($request);

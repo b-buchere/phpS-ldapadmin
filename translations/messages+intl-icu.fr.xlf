@@ -152,7 +152,7 @@
       </trans-unit>
       <trans-unit id="fa.af1v" resname="Les utilisateurs ont été mis à jour">
         <source>Les utilisateurs ont été mis à jour</source>
-        <target/>
+        <target></target>
         <note priority="1">sambaldap\src\Controller\LdapUserController.php:193</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -217,21 +217,21 @@
       </trans-unit>
       <trans-unit id="tMwZk9m" resname="Nom de l'OU">
         <source>Nom de l'OU</source>
-        <target/>
+        <target></target>
         <note priority="1">sambaldap\src\Form\LdapOucreateType.php:23</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="qoGpg2r" resname="ouName">
         <source>ouName</source>
-        <target/>
+        <target></target>
         <note priority="1">sambaldap\src\Form\LdapOucreateType.php:26</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
       </trans-unit>
       <trans-unit id="47DEQpj" resname="">
-        <source/>
-        <target/>
+        <source></source>
+        <target></target>
       </trans-unit>
       <trans-unit id="UgzbVjv" resname="structure">
         <source>structure</source>
@@ -278,7 +278,7 @@
       </trans-unit>
       <trans-unit id="uecbvpy" resname="Fichier à importer">
         <source>Fichier à importer</source>
-        <target/>
+        <target></target>
         <note priority="1">sambaldap\src\Form\LdapUserGroupUpdateType.php:21</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -325,7 +325,7 @@
       </trans-unit>
       <trans-unit id="szwn32b" resname="Adresse email">
         <source>Adresse email</source>
-        <target/>
+        <target></target>
         <note priority="1">sambaldap\src\Form\PasswordChangeRequestType.php:19</note>
         <note priority="1">new</note>
         <note priority="1">obsolete</note>
@@ -408,7 +408,7 @@
       </trans-unit>
       <trans-unit id="QggSnn5" resname="userCreate">
         <source>userCreate</source>
-        <target state="needs-translation"/>
+        <target state="needs-translation"></target>
       </trans-unit>
       <trans-unit id="vf2RxTR" resname="AllUser">
         <source>AllUser</source>
@@ -485,6 +485,15 @@
       <trans-unit id="az1Mpi1" resname="mailNotSend">
         <source>mailNotSend</source>
         <target state="translated">Envoi de courriel impossible. Erreur du Mailer</target>
+      </trans-unit>
+      <trans-unit id="4iRmrcR" resname="userModified">
+        <source>userModified</source>
+        <target state="translated">L'utilisateur a été modifié</target>
+      </trans-unit>
+      <trans-unit id="00bcUoX" resname="userPwdReseted">
+        <source>userPwdReseted</source>
+        <target state="translated">Le mot de passe de l'utilisateur a été réinitialisé.
+L'utilisateur recevra un courriel avec les instructions pour finaliser l'opération.</target>
       </trans-unit>
     </body>
   </file>
