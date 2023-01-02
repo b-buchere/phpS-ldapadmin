@@ -171,6 +171,10 @@ class LdapUserController extends BaseController
             $userUpdated = 0;
             $userError = 0;
             $session = $request->getSession();
+            
+            /**
+             * on ne traite que les csv avec au moins 4 entêtes
+             */
             if(count($csvHeader)<3){
                 $this->addFlash("danger", "fileError");
                 $logger->error($tsl->trans("fileError"));
@@ -195,6 +199,9 @@ class LdapUserController extends BaseController
                     
                     if(!is_null($user)){
                         try {
+                            /**
+                             * On crée les groupes inexistant dans l'ou TRANSVERSE
+                             */
                             if(is_null($group)){
                                 $group = (new Group)->inside('ou=Groups,ou=TRANSVERSE,dc=ncunml,dc=ass');
                                 $group->cn = $record['Groupe'];
@@ -204,11 +211,13 @@ class LdapUserController extends BaseController
                             //$userGroup = $user->groups()->attachMany($models);
                             if ($user->groups()->attach($group)) {
                                 // Successfully added the group to the user.
+                                $userUpdated++;
                             }
                             
                             $user->save();
                         } catch (\LdapRecord\LdapRecordException $e) {
                             // Failed saving user.
+                            
                         }
                     }else{
                         $error =true;
@@ -308,6 +317,10 @@ class LdapUserController extends BaseController
             $userError = 0;
             
             $session = $request->getSession();
+            
+            /**
+             * on ne traitent que les csv disposant d'au moins 5 entêtes
+             */
             if(count($csvHeader)<5){
                 $this->addFlash("danger", "fileError");
                 $logger->error($tsl->trans("fileError"));
@@ -317,6 +330,7 @@ class LdapUserController extends BaseController
                 $session->set('importProgress', 0);
                 $aSessionMessages=[];
                 foreach ($records as $ligne => $record) {
+                    
                     $session->set('importProgress', floor($userTotal/$ligne*100));
                     
                     if( empty($record['Prenom'] || empty($record['Nom'])) ){
@@ -327,19 +341,28 @@ class LdapUserController extends BaseController
                         continue;
                     }
                     
-                    $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($utilphp->sanitize_string($record['Nom'])));
+                    $sanitizedName= $utilphp->sanitize_string($record['Nom']);
+                    $user = User::findBy('samaccountname', strtolower($record['Prenom'][0]).strtolower($sanitizedName));
                     
-                    $dnRegion = 'ou='.$record['Region'].','.$dn;
-                    $dnStructure = "ou=".$record['Structure'].",".$dnRegion;
+                    $escapedRegion = ldap_escape($record['Region']);
+                    $escapedStruct = ldap_escape($record['Structure']);
+                    
+                    $dnRegion = 'ou='.$escapedRegion.','.$dn;
+                    $dnStructure = "ou=".$escapedStruct.",".$dnRegion;
                     $structureLdap = OrganizationalUnit::find($dnStructure);
                     $regionLdap = OrganizationalUnit::find($dnRegion);
                     
+                    /**
+                     * Si utilisateur n'existe pas ET si structure existe ET région existe ET colonne csv remplie
+                     * Ajout de l'utilisateur dans l'ou du couple Region/structure
+                     */
                     if(is_null($user) && !is_null($structureLdap) && !is_null($regionLdap) && !empty($record['Region'])){
-                        $user = (new User)->inside('ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
-                        $user->setDn('cn='.$record['Prenom'].' '.$record['Nom'].',ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
-                        //$user->cn = ldap_escape($record['Prenom'].' '.$record['Nom']);
+                        $user = (new User)->inside('ou='.$escapedStruct.',ou='.$escapedRegion.','.$dn);
+                        $user->setDn('cn='.$record['Prenom'].' '.$record['Nom'].',ou='.$escapedStruct.',ou='.$escapedRegion.','.$dn);
+                        
                         $user->unicodePwd = '';
-                        $user->samaccountname = strtolower($record['Prenom'][0]);
+                        
+                        $prenomusername = strtolower($record['Prenom'][0]);
                         if(strpos($record['Prenom'], '-')){
                             $prenoms = explode('-', $record['Prenom']);                            
                             
@@ -347,9 +370,10 @@ class LdapUserController extends BaseController
                             foreach($prenoms as $prenom){
                                 $prenomusername.= strtolower($prenom[0]);
                             }
-                            $user->samaccountname = $prenomusername;
+                            
                         }
-                        $user->samaccountname .= strtolower($utilphp->sanitize_string($record['Nom']));
+
+                        $user->samaccountname = $prenomusername.strtolower($sanitizedName);
                         $user->mail = $record['email'];
                         $user->userAccountControl = 512;
                         $user->pwdlastset = 0;
@@ -357,13 +381,30 @@ class LdapUserController extends BaseController
                         try {
                             $user->save();
                             $userAdded++;
+
+                            /**
+                             * @var Utilisateurs $userDb
+                             */
+                            $userDb = $this->em->getRepository(Utilisateurs::class)->findOneByIdentifiant($prenomusername.strtolower($sanitizedName));
+                            if(is_null($userDb)){
+                                $userDb = new Utilisateurs();
+                                $userDb->setDn('cn='.$record['Prenom'].' '.$record['Nom'].',ou='.$record['Structure'].',ou='.$record['Region'].','.$dn);
+                                $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
+                                $userDb->setNom($record['Nom']);
+                                $userDb->setPrenom($record['Prenom']);
+                                $userDb->setCourriel($record['email']);
+                                
+                                $this->em->persist($userDb);
+                                $this->em->flush();
+                            }
+                            
                             $logger->info($tsl->trans("userAdded").$userAdded);
                             
                         } catch (\LdapRecord\LdapRecordException $e) {
                             // Failed saving user.
-                            /*$userError++;
+                            $userError++;
                             $logger->error($tsl->trans("userAddError").implode(", ".$record));
-                            $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotAdded", ['name'=>$record['Prenom'].' '.$record['Nom']])];*/
+                            $aSessionMessages[] = ['type'=>'danger','icon'=>'fa-sharp fa-solid fa-xmark','message'=>$tsl->trans("userNotAdded", ['name'=>$record['Prenom'].' '.$record['Nom']])];
                         }
                     }else{
                         $userExists[]= $record['Prenom'].' '.$record['Nom'];
@@ -379,13 +420,11 @@ class LdapUserController extends BaseController
                 $countUserExists = count($userExists);
                 if($countUserExists > 0){
                     $logger->error($tsl->trans("userAlreadyExists" , ["count"=>$countUserExists]).implode(', ', $userExists));
-                    //$this->addFlash("danger", "userAlreadyExists,".$countUserExists.",". implode('<br/>', $userExists));
                 }
                 
                 $countLineError = count($lineError);
                 if($countLineError > 0){
                     $logger->error($tsl->trans("fileLineError").implode(', ', $lineError));
-                    //$this->addFlash("danger", "fileLineError,".$countLineError.",". implode('<br/>', $lineError));
                 }
                 
             }

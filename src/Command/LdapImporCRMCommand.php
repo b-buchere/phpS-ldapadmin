@@ -135,10 +135,10 @@ class LdapImporCRMCommand extends Command
                             file_put_contents('erreur_import.csv', $unescapedRegion.";".$unescapedStruct.";".$contact['prenom'].";".$contact['nom'].";".$contact['email']."\r\n", FILE_APPEND);
                             continue;
                         }
-                        //dump($unescapedRegion.";".$unescapedStruct.";".$contact['prenom'].";".$contact['nom'].";".$contact['email']);
+                        
                         $dnUser= "cn=".$contact['prenom'].' '.$contact['nom'].','.$dnStructure;
-                        //$userLdap = User::find($dnUser);
-                        //dump($dnUser);
+
+                        
                         echo strtolower(trim($contact['prenom'])[0]).strtolower(trim(util::sanitize_string($contact['nom'])))."\r\n";
                         $userLdap = User::where("samaccountname", "=", strtolower(trim($contact['prenom'])[0]).strtolower(trim(util::sanitize_string($contact['nom']))))->first();
                         

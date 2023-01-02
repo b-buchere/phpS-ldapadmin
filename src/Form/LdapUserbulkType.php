@@ -63,7 +63,7 @@ class LdapUserbulkType extends AbstractType
                         'class'=>""
                     ],
                     'attr'=>[
-                        "class"=>"btn btn-primary mb-3 col-12"
+                        "class"=>"btn btn-outline-dark mb-3 col-12"
                     ]
                 ]
                     );

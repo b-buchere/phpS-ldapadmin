@@ -158,10 +158,9 @@ class PasswordController extends BaseController
         $data =[];
         parse_str($dataDecoded, $data);
         $userData = $data['user'];
-        dump($userData);
         
         $form = $this->createForm(PasswordChangePromptType::class, null, ['attr'=>['class'=>'credentialForm']]);
-        dump($form);
+        
         $form->get('User')->setData($userData);
         
         $form->handleRequest($request);

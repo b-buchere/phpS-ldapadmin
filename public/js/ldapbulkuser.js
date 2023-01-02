@@ -4,17 +4,7 @@ $(document).ready(function() {
 
     var $wrapper = $('#form');
     var formAjax = new FormAjax($wrapper);
-    /*$('[name="ldap_userbulk"]').on('submit', function(e){
-        e.preventDefault();
-        console.log(e.currentTarget);
-    });*/
 
-    /*$('#ldap_userbulk_fileimport').on('change', function(e){
-        console.log(e.currentTarget);
-        var form = $(e.currentTarget.form);
-        var formData = new FormData(form);
-
-    });*/
     
 });
 
@@ -49,16 +39,7 @@ $(document).ready(function() {
 				async:true,
                 data: formData
             }).done(function(asyncContent ){
-				/*try {
-					var json = JSON.parse(asyncContent);
-					if(json.type != "danger"){
-						window.location.reload();
-					}
-				} catch (e) {
-					$('#asyncModal .modal-body').html(asyncContent);
-					var $wrapper = $('#asyncModal .modal-body');
-					var formApp = new FormAjax($wrapper);
-				}*/
+
 			});
         },
         checkProgress: function(){
@@ -68,15 +49,17 @@ $(document).ready(function() {
                 async:true,
                 type: "POST"
             }).done(function (data) {
-                console.log(data);
                 var progress = data['progress'];
                 
                 $('#importProgress .progress-bar').attr('aria-valuenow', progress);
                 $('#importProgress .progress-bar').css('width', progress+'%');
                 $('.reportBody').html(data['dataRender']);
+
                 //Si l'avancement n'est pas à 100%, cette fonction est relancée
                 if(progress != 100) {
                     setTimeout(that.checkProgress(), 2000);
+                }else{
+                	$('#reportDl').removeClass('d-none');
                 }
             });
         },

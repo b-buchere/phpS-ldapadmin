@@ -2,6 +2,10 @@
   position:absolute
 }
 
+.bg-dark{
+  background-color:#474644!important 
+}
+
 .bg-ldapadmin-navbar{
   background-color:#474644!important
 }

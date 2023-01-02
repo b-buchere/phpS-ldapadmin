@@ -189,6 +189,9 @@ class LdapGroupController extends BaseController
             $userAdded = 0;
             $userError = 0;
             
+            /**
+             * On ne traite que les csv avec au moins
+             */
             if(count($csvHeader)<5){
                 $this->addFlash("danger", "fileError");
                 $logger->error($tsl->trans("fileError"));
