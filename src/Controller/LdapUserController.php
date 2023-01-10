@@ -581,8 +581,7 @@ class LdapUserController extends BaseController
         ]);        
         
         $connection->connect();
-
-        //$connection->setCache(null);
+        
         Container::addConnection($connection);
         
         $query = $connection->query()->cache(new \DateTime(), true);
@@ -605,13 +604,7 @@ class LdapUserController extends BaseController
 
         $form->handleRequest($request);
         
-        if ($form->isSubmitted() ){
-            if($form->get('cancel')->isClicked()){
-                
-                return $this->redirectToRoute('ldapadmin_userlist');
-            }
-            
-            if($form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $data = $form->getData();
 
             $groupeFormData = $form->get('Groupes')->getData();
@@ -623,7 +616,7 @@ class LdapUserController extends BaseController
                 $user = (new User)->inside($form->get('structure')->getData());
                 $user->cn = $form->get('prenom')->getData().' '.$form->get('nom')->getData();
                 $user->unicodePwd = '';
-                $user->samaccountname = ucfirst(strtolower($form->get('prenom')->getData()[0])).strtolower($utilphp->sanitize_string($form->get('nom')->getData()));
+                $user->samaccountname = lcfirst(strtolower($form->get('prenom')->getData()[0])).strtolower($utilphp->sanitize_string($form->get('nom')->getData()));
                 $user->mail = $form->get('courriel')->getData();
                 $user->userAccountControl = 512;
                 $user->pwdlastset = 0;
@@ -663,7 +656,7 @@ class LdapUserController extends BaseController
             }
 
         }
-        }
+        
         return $this->render('ldap/admin/usercreate.html.twig', [
             'user'=>$this->getUser(),
             'form'=>$form->createView(),

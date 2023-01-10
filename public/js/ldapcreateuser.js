@@ -44,7 +44,7 @@ $(document).ready(function() {
         $('#ldap_user_create_Groupes').attr('class')
     );
     $('#ldap_user_create_Groupes').parent().find('.select2-selection').removeClass('select2-hidden-accessible');
-    $('#ldap_user_create_Groupes').parent().find('.select2-selection').removeClass('w-75');
+    $('#ldap_user_create_Groupes').parent().find('.select2-selection').removeClass('w-50');
 });
 
 (function(window, $) {

@@ -19,7 +19,7 @@
 <div class="row pt-6 mt-6">
     <div class="container col-6">
         <div>
-            <h1 class="mb-4" style="font-size:3rem"><img src="/assets/images/icone_unml.svg" class="position-relative px-2" style="height: 40px;top: -2.5px"/>Réinitialisez votre mot de passe</h1>
+            <h1 class="mb-4 text-nowrap" style="font-size:3rem"><img src="/assets/images/icone_unml.svg" class="position-relative px-2" style="height: 40px;top: -2.5px"/>Réinitialisez votre mot de passe</h1>
             <div class="px-4">
                 <ol>
                     <li>Entrez votre nom d'utilisateur (ex: Clémence Dupont = cdupont)</li>
@@ -35,8 +35,8 @@
                             {{ form_widget(form.User) }}
                         </div>
                         {% if messages %}
-                        {% set error = messages.danger %}
-                        {% if error and "Username could not be found." in error %}
+
+                        {% if messages.danger is defined and "Username could not be found." in messages.danger %}
                         <p class="col-4 text-danger m-0 position-absolute" id="changeRequestLoginError">
                         
                             {{ "Username could not be found."|trans(error, 'security') }}

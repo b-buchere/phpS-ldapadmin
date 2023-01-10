@@ -83,7 +83,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
-        if ($targetUrl = $request->headers->get('Referer')) {
+        /*if ($targetUrl = $request->headers->get('Referer')) {
             
             if (false !== $pos = strpos($targetUrl, '?')) {
                 $targetUrl = substr($targetUrl, 0, $pos);
@@ -92,7 +92,7 @@ class LoginFormAuthenticator extends AbstractLoginFormAuthenticator
             if ($targetUrl && $targetUrl !== $this->httpUtils->generateUri($request, 'login')) {
                 return  new RedirectResponse($targetUrl);
             }
-        }
+        }*/
         // For example:
         return new RedirectResponse($this->urlGenerator->generate('ldapadmin_index'));
     }

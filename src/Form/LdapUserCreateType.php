@@ -231,7 +231,7 @@ class LdapUserCreateType extends AbstractType
                         return $gr->findAllForDatatable();
                     },
                     'attr'=>[
-                        'class'=>"border border-dark rounded p-2 w-75 mb-2"
+                        'class'=>"border border-dark rounded p-2 w-50 mb-2"
                     ]
                 ]
             )->add(

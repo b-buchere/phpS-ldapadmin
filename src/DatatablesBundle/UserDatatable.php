@@ -85,11 +85,11 @@ class UserDatatable extends BaseDatatable
             'classes' => 'table table-borderless table-striped table-hover dataTable dtr-inline',
             'individual_filtering' => false,
             'individual_filtering_position' => 'head',
-            'order' => array(array(0, 'asc')),
+            'order' => array(array(1, 'asc')),
             'order_cells_top' => true,
             //'global_search_type' => 'gt',
             'search_in_non_visible_columns' => false,
-            'dom' => '<"top">t<"bottom"il>rp<"clear">',
+            'dom' => '<"top">ft<"bottom"il>rp<"clear">',
         ));
         $this->columnBuilder
             ->add('id', Column::class, array(
@@ -114,7 +114,7 @@ class UserDatatable extends BaseDatatable
                 'orderable' => true,
             ))
             ->add('groupes', Column::class, [
-                'searchable' => true,
+                'searchable' => false,
                 'orderable' => false,
                 'title'=>'Groupes',
                 'width'=>'400',
