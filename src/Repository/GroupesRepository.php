@@ -43,6 +43,20 @@ class GroupesRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('g')
                     ->andWhere("g.hidden = false")  ;
     }
+    
+    public function findAllUserByGroup( int $groupId ){
+        return $this->createQueryBuilder('g')
+        ->andWhere('g.id = :id' )
+        ->setParameter('id', $id)
+        ->andWhere("u.hidden = false");
+    }
+    
+    public function findAllGroupByUser( int $userId ){
+        return $this->createQueryBuilder('g')
+        ->innerJoin('g.membres', 'u')
+        ->andWhere('u.id = :id' )
+        ->setParameter('id', $userId)->getQuery()->getResult();
+    }
 
 //    /**
 //     * @return Groupes[] Returns an array of Groupes objects

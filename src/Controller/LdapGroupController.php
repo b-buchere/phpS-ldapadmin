@@ -378,9 +378,15 @@ class LdapGroupController extends BaseController
     public function create(Request $request): Response
     {
         $this->initHtmlHead();        
-        //$this->headerExt->headScript->appendFile('/js/ldapcreategroup.js');
+        $this->headerExt->headScript->appendFile('/js/select2.min.js');
+        $this->headerExt->headScript->appendFile('/js/ldapcreategroup.js');
+        
+        $this->headerExt->headLink->appendStylesheet('/css/select2.min.css');
+        $this->headerExt->headLink->appendStylesheet('/css/select2-bootstrap-5-theme.min.css');
 
-        $form = $this->createForm(LdapGroupcreateType::class, null);
+        $groupDb = new Groupes();
+        
+        $form = $this->createForm(LdapGroupcreateType::class, $groupDb);
         
         $form->handleRequest($request);
         $server = $this->getParameter('ldap_server');
@@ -410,9 +416,102 @@ class LdapGroupController extends BaseController
              * @var OrganizationalUnit $ou
              */
             
+            $group = Group::find('cn=GT_'.strtoupper( $data["groupName"] ).','.$transverseDn);
+            if(is_null($group)){
+                $group = (new Group)->inside($transverseDn);
+                $group->cn = 'GT_'.strtoupper( $data["groupName"] );
+                try{
+                    $group->save();
+                    
+                    $groupDb->setDn($user->getDn());
+                    $groupDb->setNom($form->get('nom')->getData());
+                    $groupDb->setHidden(false);
+                    
+                    $this->em->persist($groupDb);
+                    $this->em->flush();
+                    $this->addFlash("success", "groupCreated");
+                }catch (\LdapRecord\LdapRecordException $e) {
+                    
+                }
+            }else{
+                $this->addFlash("success", "groupOneAlreadyExists");
+            }
+            
+        }
+        return $this->render('ldap/admin/groupcreate.html.twig', [
+            'user'=>$this->getUser(),
+            'form'=>$form->createView(),
+            "activeMenu"=>"group_create",
+            'title'=>"groupCreate"
+        ]);
+    }
+    
+    /**
+     * @Route("/edit/{id}", name="edit")
+     */
+    public function edit(int $id, Request $request): Response
+    {
+        $this->initHtmlHead();
+        $this->headerExt->headScript->appendFile('/js/select2.min.js');
+        $this->headerExt->headScript->appendFile('/js/ldapcreategroup.js');
+        
+        $this->headerExt->headLink->appendStylesheet('/css/select2.min.css');
+        $this->headerExt->headLink->appendStylesheet('/css/select2-bootstrap-5-theme.min.css');
+        
+        $groupDb = $this->em->getRepository(Groupes::class)->findOneById($id);
+        if(is_null($groupDb)){
+            $groupDb = new Groupes();
+        }
+        $form = $this->createForm(LdapGroupcreateType::class, $groupDb);
+        
+        $form->handleRequest($request);
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+        ]);
+        
+        // Add the connection into the container:
+        Container::addConnection($connection);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $data = $form->getData();
+            
+            $membresFormData = $form->get('membres')->getData();
+            // connexion � un compte pour la lecture de l'annuaire
+            
+            
+            $transverseDn = "OU=Groups,OU=TRANSVERSE,DC=ncunml,DC=ass";
+            /**
+             * @var OrganizationalUnit $ou
+             */
+            $group = Group::find($groupDb->getDn());
+            $group->members()->detachAll();
+            /*
             $group = (new Group)->inside($transverseDn);
-            $group->cn = 'GT_'.strtoupper( $data["groupName"] );
-            $group->save();
+            $group->cn = 'GT_'.strtoupper( $data["nom"] );
+            $group->save();*/
+            dump($membresFormData);
+            foreach( $membresFormData as $membre ){
+                /**
+                 * @var Utilisateurs $membre
+                 */
+                
+                $ldadUser = User::find($membre->getDn());
+                
+                $group->members()->attach($ldadUser);
+                
+                
+            }  
+            $this->em->flush();
         }
         return $this->render('ldap/admin/groupcreate.html.twig', [
             'user'=>$this->getUser(),

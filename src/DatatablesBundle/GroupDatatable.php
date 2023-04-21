@@ -46,6 +46,27 @@ class GroupDatatable extends BaseDatatable
      */
     public function buildDatatable(array $options = array())
     {
+        $actions = [
+            [
+                'label' => ' ',
+                'icon'  => '',
+            ]
+            
+        ];
+        
+        if( $this->security->isGranted('create')){
+            $actions[0] = ['route' => 'ldapadmin_groupedit',
+                'label' => '',
+                'icon'  => 'fas fa-edit',
+                'route_parameters' => [
+                    'id' => 'id'
+                ],
+                'attributes' => [
+                    'rel' => 'tooltip',
+                    'title' => 'Modifier',
+                    'role' => 'button'
+                ] ];
+        }
         
         $this->ajax->setMethod("POST");
         $this->ajax->setUrl($options['ajaxUrl']);
@@ -73,6 +94,13 @@ class GroupDatatable extends BaseDatatable
                 'title' => 'Nom',
                 'searchable' => true,
                 'orderable' => true,
+            ))
+            ->add(null, ActionColumn::class, array(
+                'title' => 'Actions',
+                'start_html' => '<div class="btn-group w-100" role="group" aria-label="actions">',
+                'end_html' => '</div>',
+                'actions' => $actions,
+
             ));
             $this->language->set(array(
                 'language_by_locale' => true

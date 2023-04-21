@@ -72,8 +72,24 @@ class UserDatatable extends BaseDatatable
             'attributes' => [
                 'rel' => 'tooltip',
                 'title' => 'Modifier',
-                'role' => 'button'
+                'role' => 'button',
+                'class' => 'btn p-0 btn-light'
             ] ];
+            $actions[] = ['route' => 'ldapadmin_userdelete',
+                'label' => '',
+                'icon'  => 'fas fa-trash',
+                'route_parameters' => [
+                    'id' => 'id'
+                ],
+                'attributes' => [
+                    'rel' => 'tooltip',
+                    'title' => 'Supprimer',
+                    'role' => 'button',
+                    'class' => 'btn p-0 btn-light',
+                    //'onclick'=> "event.preventDefault();confirm_delete()"
+                    'data-action'=>'delete'
+                ] ];
+            
         }
         
         $this->ajax->setMethod("POST");
@@ -82,6 +98,7 @@ class UserDatatable extends BaseDatatable
         $this->features->setAutoWidth(false);
 
         $this->options->set(array(
+            'row_id'=> 'id',
             'classes' => 'table table-borderless table-striped table-hover dataTable dtr-inline',
             'individual_filtering' => false,
             'individual_filtering_position' => 'head',
@@ -138,22 +155,7 @@ class UserDatatable extends BaseDatatable
                 'title' => 'Actions',
                 'start_html' => '<div class="btn-group w-100" role="group" aria-label="actions">',
                 'end_html' => '</div>',
-                'actions' => $actions,/*,
-                    [
-                        'route' => 'admin_product_delete',
-                        'label' => '',
-                        'icon'  => 'fas fa-trash',
-                        'route_parameters' => [
-                            'id' => 'id',
-                        ],
-                        'attributes' => [
-                            'rel' => 'tooltip',
-                            'title' => 'Supprimer',
-                            'class' => 'btn btn-danger btn-xs',
-                            'role' => 'button'
-                        ]
-                    ]*/
-                //]
+                'actions' => $actions
             ));
         
             $this->language->set(array(

@@ -21,7 +21,7 @@ use LdapRecord\Models\ActiveDirectory\Group;
  */
 
 #[AsCommand(name: 'ldap:user:sync')]
-class LdapSyncDBCommand extends Command
+class LdapSyncDBUserCommand extends Command
 {
     protected static $defaultName = 'ldap:user:sync';
     private $cacheDir;

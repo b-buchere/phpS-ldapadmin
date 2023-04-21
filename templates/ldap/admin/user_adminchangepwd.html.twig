@@ -1,0 +1,70 @@
+                               
+{% extends 'ldap/admin/ldapadmin.base.html.twig' %}  
+
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{% block title %}Centre d'administration - Modification du mot de passe{% endblock %}
+
+{% block body %}
+<div class="container col-10">
+<h1 class="border-bottom border-dark border-2 py-2">{{ title|trans }}</h1>
+
+{# Affiche tous les messages flash #}
+{% for type, messages in app.flashes %}
+    <div class="alert bg-{% if type == "error" %}danger{% else %}{{ type }}{% endif %} {% if type != "info" %}text-white{% endif %}">
+
+    {% for message in messages %}
+        <p class="m-0">
+            {{ message|trans|raw}}
+        </p>
+    {% endfor %}
+    </div>
+{% endfor %}
+
+<div>
+    <div class="px-4">
+        <div class="m-2">
+            Le nouveau mot de passe <strong>doit</strong> respecter les caractéristiques suivantes :
+            <ul>
+                <li><i>8 caractères minimum</i></li>
+                <li><i>une majuscule minimum</i></li>
+                <li><i>un chiffre minimum</i></li>
+            </ul>
+            Le nouveau mot de passe ne <strong>doit pas </strong>être un mot de passe récent.
+        </div>
+        <div class="container">
+            {{ form_start(form) }}
+
+                {{ form_row(form.User) }}
+
+            <div class="row justify-content-center mb-3 position-relative">
+                <label class="col-4 col-form-label required">{{ 'user'|trans }}</label>
+                <div class="col-8">
+                    <strong>{{ userDb.prenom }} {{ userDb.nom }}</strong>
+                </div>
+            </div>
+            <div class="row justify-content-center mb-3 position-relative">
+                {{ form_label(form.NewPassword) }}
+                <div class="col-4">
+                    {{ form_widget(form.NewPassword) }}
+                </div>
+                <div class="col-4">
+                    {{ form_widget(form.NewPasswordCnfm) }}
+                </div>
+            </div>
+
+
+            <div class="row justify-content-center">
+                <div class="col-3">
+                    {{ form_widget(form.submit) }}
+                </div>
+                <div class="col-3">
+                    <a id="password_change_prompt_back" href="{{ path('ldapadmin_useredit', {id:userDb.id}) }}" class="btn btn-outline-dark inverted col-12 p-0 btn">{{ 'returnToUser'|trans }}</a>
+                </div>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+
+{% endblock %}

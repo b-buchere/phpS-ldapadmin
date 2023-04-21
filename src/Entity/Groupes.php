@@ -98,6 +98,15 @@ class Groupes
 
         return $this;
     }
+    
+    public function removeAllMembre(): self
+    {
+        foreach($this->membres as $membre){
+            $this->membres->removeElement($membre);
+        }
+        
+        return $this;
+    }
 
     public function isHidden(): ?bool
     {

@@ -10,6 +10,16 @@
 
 <div class="row gx-4 m-0">
 
+    {% for type, messages in app.flashes %}
+    <div class="alert bg-{% if type == "error" %}danger{% else %}{{ type }}{% endif %} {% if type != "info" %}text-white{% endif %}">
+
+    {% for message in messages %}
+        <p class="m-0">
+            {{ message|trans|raw}}
+        </p>
+    {% endfor %}
+    </div>
+{% endfor %}
     
     <div class="pb-2">
         {% if is_granted('create', user) %}
@@ -32,7 +42,24 @@
 
 $(document).ready(function(){
 
-    var oTable = $('#sg-datatables-user_datatable').dataTable();
+    var oTable = $('#sg-datatables-user_datatable').on( 'init.dt', function () {
+        $('#sg-datatables-user_datatable a[data-action="delete"]').on('click', function(event){
+            event.preventDefault();
+            var href=$(this).attr('href');
+            var row = oTable.api().row($(this).parents('tr')).data();
+            console.log(row);
+            bootbox.confirm({
+                size: 'small',
+                locale: 'fr',
+                message: "Voulez-vous vraiment supprimer l'utilisateur <i>"+row['nom']+"</i> (identifiant: <strong>"+row['identifiant']+"</strong>) ?",
+                callback: function(result){
+                    if(result){
+                        document.location = href;
+                    }
+                }
+            } )
+        });
+    } ).dataTable();
     $.fn.DataTable.ext.pager.numbers_length = 5;
 
     $('#sg-datatables-user_datatable_wrapper .bottom').addClass('row');
@@ -44,6 +71,8 @@ $(document).ready(function(){
     });
     
     $('#tab li:first-child button').trigger('click');
+
+    
 });
 
 </script>

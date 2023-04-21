@@ -220,7 +220,7 @@ class LdapUserCreateType extends AbstractType
                     ],
                 ]
             )->add(
-                'Groupes',
+                'groupes',
                 EntityType::class,
                 [
                     'class'=>Groupes::class,

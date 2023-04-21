@@ -50,7 +50,7 @@ class Utilisateurs
     private $hidden;
     
     /**
-     * @ORM\ManyToMany(targetEntity=Groupes::class, mappedBy="membres")
+     * @ORM\ManyToMany(targetEntity=Groupes::class, mappedBy="membres", fetch="EAGER")
      */
     private $groupes;
 
@@ -150,6 +150,16 @@ class Utilisateurs
             $groupe->removeMembre($this);
         }
 
+        return $this;
+    }
+    
+    public function removeAllGroupe(): self
+    {
+        dump($this->groupes);
+        foreach ($this->groupes as $groupe){
+            $groupe->removeMembre($this);
+        }
+        
         return $this;
     }
     

@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Form\LdapUserCreateType;
 use App\Form\LdapUserGroupUpdateType;
+use App\Form\PasswordChangePromptType;
 use App\Twig\HeaderExtension;
 use Symfony\Component\Ldap\Ldap;
 use Symfony\Component\Mailer\MailerInterface;
@@ -43,6 +44,9 @@ use App\Entity\Utilisateurs;
 use Doctrine\ORM\EntityManagerInterface;
 use App\Repository\UtilisateursRepository;
 use App\Entity\Groupes;
+use Symfony\Component\Ldap\Security\LdapUser;
+use Doctrine\DBAL\Exception\ConstraintViolationException;
+use LdapRecord\LdapRecordException;
 /**
  * @Route("/ldapadmin", name="ldapadmin_")
  */
@@ -711,6 +715,7 @@ class LdapUserController extends BaseController
          * @var Utilisateurs $userDb
          */
         $userDb = $this->em->getRepository(Utilisateurs::class)->findOneById($id);
+        
         if(is_null($userDb)){
             $userDb = new Utilisateurs();
         }
@@ -721,23 +726,17 @@ class LdapUserController extends BaseController
             'ldap_connection'=>$connection
         ]);
 
-        
         $form->handleRequest($request);
         
-        if ($form->isSubmitted() ){
-            if($form->get('cancel')->isClicked()){
-                
-                return $this->redirectToRoute('ldapadmin_userlist');
-            }
-        
-            if($form->isValid()) {
-            
+        if ($form->isSubmitted() && $form->isValid()) {
+
                 $utilphp = new util();
     
                 $user = User::findBy('samaccountname', strtolower($form->get('prenom')->getData()[0]).strtolower($utilphp->sanitize_string($form->get('nom')->getData())));            
     
                 if(is_null($user)){
                     $user = (new User)->inside($form->get('structure')->getData());
+                    $user->cn = $form->get('prenom')->getData().' '.$form->get('nom')->getData();
                     $user->unicodePwd = '';
                     $user->samaccountname = ucfirst(strtolower($form->get('prenom')->getData()[0])).strtolower($utilphp->sanitize_string($form->get('nom')->getData()));
                     $user->userAccountControl = 512;
@@ -748,50 +747,101 @@ class LdapUserController extends BaseController
                 
                 try {
                     
-                    $groupeFormData = $form->get('Groupes')->getData();
+                    $groupeFormData = $form->get('groupes')->getData();
     
                     $user->save();
                     
                     $user->groups()->detachAll();
+
+                    $groupeUserDb = $this->em->getRepository(Groupes::class)->findAllGroupByUser($userDb->getId());
                     
-                    $userDb->setDn($user->getDn());
-                    $userDb->setIdentifiant($user->getAttribute('samaccountname')[0]);
-                    $userDb->setNom($form->get('nom')->getData());
-                    //$userDb->setCourriel($user->getAttribute('mail'));
-                    
-                    $this->em->persist($userDb);
-                    
+                    foreach($groupeUserDb as $groupeUser){
+                        $groupeUser->removeMembre($userDb);
+                    }
                     foreach( $groupeFormData as $groupe ){
-                        /**
-                         * @var Groupes $groupe
-                         */
-                        //$groupeDb = $this->em->getRepository(Groupes::class)->findOneById((int)$groupe);
-                        
                         $groupe->addMembre($userDb);
-                        $this->em->persist($groupe);
                             
                         $ldadGroupe = Group::find($groupe->getDn());
                         
                         $user->groups()->attach($ldadGroupe);
-                        
+                        $this->em->persist($groupe);
+                        $this->em->flush();
                     }                  
-    
-                    $this->em->persist($userDb);
-                    $this->em->flush();
                     
+                    $this->em->flush();
                     $this->addFlash("success", "userModified");
+                    
                 } catch (\LdapRecord\LdapRecordException $e) {
                     // Failed saving user.
                     //dump($e);
                 }
             }
-        }
+        
         return $this->render('ldap/admin/usercreate.html.twig', [
             'user'=>$this->getUser(),
             'form'=>$form->createView(),
             "activeMenu" =>"user_create",
             'title'=>$userDb->getPrenom().' '.$userDb->getNom()
         ]);
+    }
+    
+    /**
+     * @Route("/userdelete/{id}", name="userdelete")
+     */
+    public function delete(int $id, Request $request): Response
+    {
+        $this->initHtmlHead();
+
+        
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
+        
+        $query = $connection->query();
+        
+        /**
+         * @var Utilisateurs $userDb
+         */
+        $userDb = $this->em->getRepository(Utilisateurs::class)->findOneById($id);
+        
+        try {            
+            
+            if( !is_null($userDb)){
+                /**
+                 * @var User $user
+                 */                
+                $user = User::findBy('samaccountname', $userDb->getIdentifiant());
+            
+                if( !is_null($user)){
+                    $query->delete($user->getDn());
+                }
+                
+                $this->em->remove($userDb);
+            }
+            
+            $this->em->flush();
+            $this->addFlash("success", "userDeleted");
+            
+        } catch (\LdapRecord\LdapRecordException $e) {
+            // Failed saving user.
+            //dump($e);
+        }
+        return $this->redirectToRoute('ldapadmin_userlist');
     }
     
     /**
@@ -804,6 +854,7 @@ class LdapUserController extends BaseController
         $this->headerExt->headLink->appendStylesheet('https://cdn.datatables.net/1.11.3/css/dataTables.bootstrap5.min.css');
         $this->headerExt->headScript->appendFile('//cdn.datatables.net/1.11.3/js/jquery.dataTables.min.js');
         $this->headerExt->headScript->appendFile('https://cdn.datatables.net/1.11.3/js/dataTables.bootstrap5.min.js');
+        $this->headerExt->headScript->appendFile('/js/bootbox.all.min.js');
         $this->headerExt->headStyle->appendStyle('//cdn.datatables.net/1.11.3/css/jquery.dataTables.min.css');
         
         $server = $this->getParameter('ldap_server');
@@ -832,7 +883,7 @@ class LdapUserController extends BaseController
         
         if ($isAjax) {
 
-            $responseService->setQb($this->em->getRepository(Utilisateurs::class)->findAllForDatatableUserRight());
+            $responseService->setQb($this->em->getRepository(Utilisateurs::class)->findAllForDatatable());
             
             $responseService->setDatatable($datatable);
             return $responseService->getResponse();
@@ -844,6 +895,119 @@ class LdapUserController extends BaseController
             'title'=>"AllUser",
             'datatable'=>$datatable
         ]);
+    }
+
+    /**
+     * @Route("/user/{userId}/adminchangepwd", name="user_adminchangepwd")
+     */
+    public function adminchangepwd(int $userId, Request $request): Response
+    {
+        $this->initHtmlHead();
+        
+        $server = $this->getParameter('ldap_server');
+        $dn = $this->getParameter('ad_base_dn');
+        $user_admin = $this->getParameter('ad_passwordchanger_user');
+        $user_pwd = $this->getParameter('ad_passwordchanger_pwd');
+        
+        // Create a new connection:
+        $connection = new Connection([
+            'hosts' => [$server],
+            'port' => 389,
+            'base_dn' => $dn,
+            'username' => $user_admin,
+            'password' => $user_pwd,
+            'use_tls'  => true,
+            'follow_referrals' => false,
+            'version'  => 3,
+        ]);
+        
+        $connection->connect();
+        
+        Container::addConnection($connection);
+        
+        $query = $connection->query();
+        
+        $userDb = $this->em->getRepository(Utilisateurs::class)->findOneById($userId);
+        
+        /** 
+         * 
+         * @var User $user
+         */
+        $user = User::findBy('samaccountname', strtolower($userDb->getIdentifiant()));
+        /**
+         * @var Utilisateurs $userDb
+         */        
+        $form = $this->createForm(PasswordChangePromptType::class, null, ['attr'=>['class'=>'credentialForm']]);
+        //$form->get('User')->setData($userId);
+        
+        $form->handleRequest($request);
+        
+        if ($form->isSubmitted() && $form->isValid()) {
+            $dataForm = $form->getData();
+            $newPassword = $dataForm['NewPassword'];
+            //Create an instance; passing `true` enables exceptions
+            
+            //Confirmation du nouveau mot de passe
+            if ($newPassword != $dataForm['NewPasswordCnfm'] ) {
+                $this->addFlash("danger", "confirmNoMatch");
+            }
+            
+            //longueur du mot de passe
+            if (strlen($newPassword) < 8 ) {
+                $this->addFlash("danger", "pwdTooShort");
+            }
+            //chiffre nécessaire
+            if (!preg_match("/[0-9]/",$newPassword)) {
+                $this->addFlash("danger", "pwdNoDigit");
+            }
+            //Lettre nécessaire
+            if (!preg_match("/[a-zA-Z]/",$newPassword)) {
+                $this->addFlash("danger", "pwdNoCharacter");
+            }
+            //Majuscule nécessaire
+            if (!preg_match("/[A-Z]/",$newPassword)) {
+                $this->addFlash("danger", "pwdNoUppercase");
+            }
+            
+            //Pb de compte (différent d'un verrouilage de compte)
+            if (is_null($user) ) {
+                $this->addFlash("danger", "ldapUserError");
+            }
+            
+            try {
+                $user->unicodepwd = $newPassword;
+                $user->save();
+                                    
+                $this->addFlash("success", "userPwdModifiedByAdmin");
+
+            } catch (ConstraintViolationException $ex) {
+                // The users new password does not abide
+                // by the domains password policy.
+            } catch (LdapRecordException $ex) {
+                // Failed changing password. Get the last LDAP
+                // error to determine the cause of failure.
+                /**
+                 *  @var DetailedError $error
+                 */
+                $error = $ex->getDetailedError();
+                
+                $errno = $error->getErrorCode();
+                
+                $message["danger"] = [
+                    "impossible de changer le mot de passe, veuillez contacter l'administrateur.",
+                    $errno." - ".$error->getDiagnosticMessage(),
+                    $error->getErrorMessage()
+                ];
+            }
+        }
+        return $this->render('ldap/admin/user_adminchangepwd.html.twig', [
+            'user'=>$this->getUser(),
+            'userDb'=>$userDb,
+            'form'=>$form->createView(),
+            "activeMenu" =>"user_create",
+            'title'=>'resetPwd'
+        ]);
+        //return $this->redirectToRoute('ldapadmin_user_adminchangepwd', ['userid'=>$userId]);
     }
     
     /**

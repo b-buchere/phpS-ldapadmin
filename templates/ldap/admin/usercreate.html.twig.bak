@@ -6,7 +6,7 @@
 <div class="container col-10">
 <h1 class="border-bottom border-dark border-2 py-2">{{ title|trans }}
         {% if form.vars.data.id %}
-            | <a class="text-decoration-none text-body fs-5" href="{{ path('ldapadmin_user_adminchangepwd', {userId: form.vars.data.id}) }}">
+            | <a class="text-decoration-none text-body fs-5" href="{{ path('ldapadmin_user_resetpwd', {id: form.vars.data.id}) }}">
             <span class="bi bi-fa">
             <i class="fa-solid fa-key"></i></span> {{ 'resetPwd'|trans }}
             
@@ -20,6 +20,7 @@
     {% for message in messages %}
         <p class="m-0">
             {{ message|trans|raw}}
+            {{ 'groupOneAlreadyExists'|trans|raw}}
         </p>
     {% endfor %}
     </div>
@@ -47,7 +48,7 @@
     <div class="row">
         <h2 class="border-bottom border-dark border-2 px-0 py-2">Membre de</h2>
         <p class="mb-1"> cliquez dans le cadre ci-dessous pour sélectionner un groupe d'utilisateur</p>
-        {{ form_widget(form.groupes) }}
+        {{ form_widget(form.Groupes) }}
     </div>
 
         {% if not form.vars.data.id %}
