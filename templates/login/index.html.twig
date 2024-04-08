@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form 'form_theme/loginform.html.twig' %}
+
+{% block title %}Connexion!{% endblock %}
+{% block head_style %}
+    <style>
+      body {
+          background-color: #ffffff;
+          font-weight: normal;
+          font-size: .875em;
+          line-height: 1.6em;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
+          color: #000;
+          background-color: #0082c9;
+          background-image: url('../img/background.png?v=2');
+          background-image: url('../img/background.png?v=2'), linear-gradient(40deg, #0082c9 0%, rgba(28, 175, 255, 1) 100%);
+          background-position: 50% 50%;
+          background-repeat: repeat;
+          background-size: 275px, contain;
+          background-attachment: fixed;
+          min-height: 100%;
+          height: auto;
+          font-size:20px;
+      }
+      
+      .btn-primary{
+        color: rgba(255, 255, 255, 1);
+        background-color: #0082c9;
+        background-position: initial;
+        border: 1px solid #fff;
+        transition: color 100ms ease-in-out;
+        border-radius: 100px;
+        font-size:20px;
+        font-weight: bold;
+      }
+      
+      .btn-primary:hover{
+          color: rgba(255, 255, 255, 1);
+          background-image: linear-gradient(40deg, #0082c9 0%, #30b6ff 100%);
+          background-position: initial;
+          border: 1px solid #fff;          
+      }   
+      
+      .mt-6{
+        margin-top:6rem
+      }
+      
+      .pt-6{
+        padding-top:6rem
+      }
+      .form-control{
+        font-size:20px
+      }
+    </style>
+{% endblock %}
+{% block body %}
+
+
+<div class="row pt-6 mt-6">
+    <div class="col-4"></div>
+    <div class="col-4">
+        <div>
+            {{ form(form) }}
+        </div>
+    </div>
+    <div class="col-4">
+        {% if error %}
+        <div>{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+    {% endif %}</div>
+</div>
+{% endblock %}
