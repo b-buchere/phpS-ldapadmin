@@ -1,0 +1,19 @@
+{% use 'bootstrap_5_layout.html.twig' %}
+
+{%- block form_widget_compound -%}
+    <h2 class="combined-header">Connexion</h2>
+    <div {{ block('widget_container_attributes') }} class="fields">
+        {%- if form is rootform -%}
+        {{ form_errors(form) }}
+        {%- endif -%}
+        {{- block('form_rows') -}}
+        {{- form_rest(form) -}}
+    </div>
+{%- endblock form_widget_compound -%}
+
+{%- block widget_attributes -%}
+    id="{{ id }}" name="{{ full_name }}"
+    {%- if disabled %} disabled="disabled"{% endif -%}
+    {%- if required %} required="required"{% endif -%}
+    {{ block('attributes') }}
+{%- endblock widget_attributes -%}

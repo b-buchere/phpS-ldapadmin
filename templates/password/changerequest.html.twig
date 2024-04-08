@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}  
+
+{% form_theme form 'form_theme/passwordchanger.html.twig' %}
+
+{% block title %}
+Demande de changement de mot de passe
+{% endblock %}
+
+{% block body %}
+
+<div id="body-login">
+    <div class="wrapper">
+        <div class="v-align">
+            <header role="banner">
+                <div id="header">
+                    <div class="logo">
+
+                    </div>
+                </div>
+            </header>
+            <h2 class="hidden-visually">Demande de changement de mot de passe</h2>
+            <main>
+                <div>      
+                    <div class="login-additional">          
+                        <div class="lost-password-container">
+                            {% include helpHtml %} 
+                            {{ form(form) }}
+                        </div>
+                        {% if form.vars.submitted %}                
+                            {% for type, messageType in messages %}
+                            <div class="update {{ type }}">
+                                {% for message in messageType %}
+                                    <p>{{ message }}</p>
+                                {% endfor %}
+                            </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </div>
+
+            </main>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

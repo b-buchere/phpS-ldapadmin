@@ -1,0 +1,15 @@
+translation:
+    locales: ["en","fr"]
+    edit_in_place:
+        enabled: false
+        config_name: app
+    configs:
+        app:
+            dirs: ["%kernel.project_dir%/templates", "%kernel.project_dir%/src"]
+            output_dir: "%kernel.project_dir%/translations"
+            excluded_names: ["*TestCase.php", "*Test.php"]
+            excluded_dirs: [cache, data, logs]
+            xliff_version: '1.2'
+            local_file_storage_options:
+              xliff_version: "1.2"
+              output_format: "xliff"
